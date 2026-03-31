@@ -1,0 +1,4404 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dual Crypto Wallet — Educatief</title>
+<style>
+/* Local font stack — no external dependency */
+/* ── Reset & tokens ───────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  /* CryptoVault — dark teal/neon */
+  --cv-bg:#07090d;
+  --cv-surf:#0f1319;
+  --cv-surf2:#161b24;
+  --cv-border:#1e2535;
+  --cv-accent:#00e5a0;
+  --cv-accent2:#0088ff;
+  --cv-warn:#ff6b35;
+  --cv-text:#dce8f5;
+  --cv-muted:#4a5a70;
+
+  /* OM-Wallet — warm ivory/gold */
+  --om-bg:#faf7f2;
+  --om-surf:#ffffff;
+  --om-surf2:#f3ede3;
+  --om-border:#e2d9cc;
+  --om-accent:#c9922a;
+  --om-accent2:#1a6b4a;
+  --om-warn:#c0392b;
+  --om-text:#1a1510;
+  --om-muted:#8a7d6e;
+
+  --mono:'IBM Plex Mono',ui-monospace,'Cascadia Code','Fira Code','Consolas','Courier New',monospace;
+  --display:'Syne','Segoe UI','Helvetica Neue',Arial,sans-serif;
+}
+
+html,body{
+  height:100%;
+  overflow:hidden;
+}
+
+body{
+  display:flex;
+  flex-direction:column;
+  background: radial-gradient(ellipse at 30% 20%, #1a1f2e 0%, #0a0c12 60%, #000 100%);
+  font-family:var(--mono);
+  min-height:100vh;
+}
+
+/* ── Top bar ──────────────────────────────────────────── */
+.topbar{
+  flex-shrink:0;
+  background:transparent;
+  border-bottom:1px solid #ffffff08;
+  display:flex;
+  align-items:center;
+  padding:0 28px;
+  height:44px;
+  gap:12px;
+  z-index:10;
+}
+.topbar-title{
+  font-family:var(--display);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.18em;
+  color:#ffffff20;
+  text-transform:uppercase;
+}
+.edu-badge{
+  background:#ffffff06;
+  border:1px solid #ffffff0c;
+  color:#ffffff18;
+  font-size:9px;
+  padding:2px 8px;
+  border-radius:3px;
+  letter-spacing:.1em;
+}
+.net-badge{
+  margin-left:auto;
+  font-size:9px;
+  color:#ffffff12;
+  letter-spacing:.12em;
+}
+
+/* ── Desk scene ───────────────────────────────────────── */
+.desk-scene{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px 20px 20px;
+  overflow:hidden;
+  position:relative;
+  gap:0;
+}
+.desk-scene::before{
+  content:'';
+  position:absolute;
+  bottom:0;left:5%;right:5%;height:35%;
+  background:radial-gradient(ellipse at 50% 100%, rgba(0,229,160,.05) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+/* ── Phone wrapper ────────────────────────────────────── */
+.phone-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  flex-shrink:0;
+}
+.phone-label{
+  font-family:var(--display);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:#ffffff1a;
+}
+
+/* ── Phone frame ──────────────────────────────────────── */
+.phone-frame{
+  position:relative;
+  border-radius:46px;
+  padding:3px;
+  flex-shrink:0;
+}
+.phone-frame.cv-frame{
+  background:linear-gradient(155deg,#2e2e34 0%,#1c1c22 40%,#111116 100%);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.06),
+    0 40px 100px rgba(0,0,0,.85),
+    0 10px 30px rgba(0,0,0,.6),
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -1px 0 rgba(0,0,0,.5);
+  width: clamp(240px, 22vw, 300px);
+}
+.phone-frame.om-frame{
+  background:linear-gradient(155deg,#d8d8de 0%,#c0c0c8 40%,#a8a8b0 100%);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.3),
+    0 40px 100px rgba(0,0,0,.75),
+    0 10px 30px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.5),
+    inset 0 -1px 0 rgba(0,0,0,.2);
+  width: clamp(240px, 22vw, 300px);
+}
+
+/* side buttons */
+.phone-frame.cv-frame::before{
+  content:'';position:absolute;
+  right:-4px;top:110px;width:3px;height:60px;
+  background:linear-gradient(to bottom,#222,#1a1a1a);
+  border-radius:0 2px 2px 0;
+  box-shadow:0 0 0 .5px #333;
+}
+.phone-frame.cv-frame::after{
+  content:'';position:absolute;
+  left:-4px;top:100px;width:3px;height:36px;
+  background:linear-gradient(to bottom,#222,#1a1a1a);
+  border-radius:2px 0 0 2px;
+  box-shadow:
+    0 0 0 .5px #333,
+    0 44px 0 0 #1a1a1a,
+    0 44px 0 .5px #333,
+    0 44px 0 0 #1a1a1a;
+}
+.phone-frame.om-frame::before{
+  content:'';position:absolute;
+  right:-4px;top:110px;width:3px;height:60px;
+  background:linear-gradient(to bottom,#c0c0c8,#b0b0b8);
+  border-radius:0 2px 2px 0;
+  box-shadow:0 0 0 .5px #d0d0d8;
+}
+.phone-frame.om-frame::after{
+  content:'';position:absolute;
+  left:-4px;top:100px;width:3px;height:36px;
+  background:linear-gradient(to bottom,#c0c0c8,#b0b0b8);
+  border-radius:2px 0 0 2px;
+  box-shadow:
+    0 0 0 .5px #d0d0d8,
+    0 44px 0 0 #b8b8c0,
+    0 44px 0 .5px #d0d0d8;
+}
+
+/* inner bezel */
+.phone-bezel{
+  border-radius:43px;
+  overflow:hidden;
+  position:relative;
+  background:#000;
+}
+
+/* Dynamic island */
+.phone-notch{
+  position:absolute;
+  top:10px;left:50%;transform:translateX(-50%);
+  width:88px;height:26px;
+  background:#000;
+  border-radius:13px;
+  z-index:20;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.phone-notch .cam{
+  width:10px;height:10px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#1e1e22,#0a0a0e);
+  border:1px solid #2a2a2e;
+  position:relative;
+}
+.phone-notch .cam::after{
+  content:'';display:block;
+  width:4px;height:4px;border-radius:50%;
+  background:radial-gradient(circle,rgba(30,80,130,.9),rgba(10,30,70,.6));
+  position:absolute;top:2px;left:2px;
+}
+.phone-notch .speaker{
+  width:34px;height:4px;border-radius:2px;
+  background:linear-gradient(to right,#111,#1a1a1a,#111);
+}
+
+/* status bar */
+.phone-status{
+  position:absolute;
+  top:0;left:0;right:0;height:46px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 22px 7px;
+  font-size:9px;font-family:var(--display);font-weight:700;
+  z-index:15;pointer-events:none;
+}
+.cv-frame .phone-status{color:rgba(220,232,245,.55);}
+.om-frame .phone-status{color:rgba(26,21,16,.4);}
+.status-time{font-size:11px;font-weight:700;letter-spacing:.02em;}
+.status-icons{display:flex;align-items:center;gap:4px;}
+/* battery icon */
+.status-icons::after{
+  content:'▮';font-size:10px;margin-left:1px;
+}
+
+/* phone screen */
+.phone-screen{
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-top:46px;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  height: clamp(480px, 72vh, 650px);
+}
+.phone-screen::-webkit-scrollbar{display:none;}
+
+/* Panel wrappers (inside screens) */
+.panel{height:100%;}
+.panel-cv{background:var(--cv-bg);color:var(--cv-text);}
+.panel-om{background:var(--om-bg);color:var(--om-text);}
+
+/* home indicator bar */
+.phone-home{
+  height:26px;
+  display:flex;align-items:center;justify-content:center;
+}
+.cv-frame .phone-home{background:var(--cv-bg);}
+.om-frame .phone-home{background:var(--om-bg);}
+.phone-home-bar{width:100px;height:4px;border-radius:2px;}
+.cv-frame .phone-home-bar{background:rgba(255,255,255,.18);}
+.om-frame .phone-home-bar{background:rgba(0,0,0,.12);}
+
+/* ── TX connector between phones ──────────────────────── */
+.phone-connector{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:6px;
+  width:72px;flex-shrink:0;
+  padding-bottom:40px;
+}
+.arrow-anim{
+  display:flex;flex-direction:column;
+  align-items:center;gap:5px;
+}
+.arrow-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--cv-accent);opacity:0;
+  animation:flowRight 1.8s ease-in-out infinite;
+}
+.arrow-dot:nth-child(1){animation-delay:0s}
+.arrow-dot:nth-child(2){animation-delay:.3s}
+.arrow-dot:nth-child(3){animation-delay:.6s}
+.arrow-dot:nth-child(4){animation-delay:.9s}
+
+@keyframes flowRight{
+  0%{opacity:0;transform:translateX(-5px)}
+  30%{opacity:1}
+  70%{opacity:1}
+  100%{opacity:0;transform:translateX(5px)}
+}
+.connector-label{
+  font-size:8px;letter-spacing:.18em;
+  color:#ffffff14;text-transform:uppercase;white-space:nowrap;
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media(max-height:750px){
+  .phone-screen{height:clamp(400px,65vh,560px);}
+}
+@media(max-width:720px){
+  .desk-scene{flex-direction:column;overflow-y:auto;padding:10px 16px 16px;gap:12px;}
+  html,body{height:auto;overflow:auto;}
+  .phone-connector{flex-direction:row;width:auto;padding:0;height:40px;}
+  .arrow-anim{flex-direction:row;}
+  @keyframes flowRight{
+    0%{opacity:0;transform:translateY(-5px)}
+    30%{opacity:1}
+    70%{opacity:1}
+    100%{opacity:0;transform:translateY(5px)}
+  }
+  .phone-frame.cv-frame,.phone-frame.om-frame{width:clamp(280px,88vw,360px);}
+  .phone-screen{height:580px;}
+}
+
+/* ── CV styles ────────────────────────────────────────── */
+.cv{padding:16px 14px}
+
+.cv .header{
+  display:flex;align-items:center;gap:10px;margin-bottom:24px;
+}
+.cv .logo{
+  width:32px;height:32px;background:var(--cv-accent);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:15px;color:#000;
+}
+.cv h1{font-family:var(--display);font-size:16px;font-weight:700;color:var(--cv-text)}
+.cv .net{
+  margin-left:auto;font-size:9px;color:var(--cv-muted);
+  background:var(--cv-surf2);padding:2px 7px;border-radius:3px;
+  border:1px solid var(--cv-border);letter-spacing:.1em;
+}
+
+.cv .screen{display:none}
+.cv .screen.active{display:block}
+
+/* Cards */
+.cv .card{
+  background:var(--cv-surf);border:1px solid var(--cv-border);
+  border-radius:10px;padding:18px;margin-bottom:12px;
+}
+.cv .card-lbl{
+  font-size:10px;letter-spacing:.14em;color:var(--cv-muted);
+  text-transform:uppercase;margin-bottom:12px;
+}
+
+/* Mnemonic grid */
+.cv .mg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px}
+.cv .wi-wrap{position:relative}
+.cv .wi-num{position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--cv-muted)}
+.cv .wi{
+  width:100%;background:var(--cv-surf2);border:1px solid var(--cv-border);
+  border-radius:5px;padding:7px 7px 7px 24px;color:var(--cv-text);
+  font-family:var(--mono);font-size:12px;outline:none;transition:border-color .15s;
+}
+.cv .wi:focus{border-color:var(--cv-accent)}
+.cv .wi.valid{border-color:rgba(0,229,160,.35)}
+.cv .wi.invalid{border-color:rgba(255,107,53,.4)}
+
+/* Buttons */
+.cv .btn{
+  display:block;width:100%;padding:10px;border-radius:7px;border:none;
+  cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:500;
+  letter-spacing:.04em;margin-bottom:6px;transition:all .15s;
+}
+.cv .btn-p{background:var(--cv-accent);color:#000}
+.cv .btn-p:hover{filter:brightness(1.1)}
+.cv .btn-s{background:transparent;color:var(--cv-muted);border:1px solid var(--cv-border)}
+.cv .btn-s:hover{border-color:var(--cv-accent);color:var(--cv-accent)}
+
+/* Address bar */
+.cv .addr-bar{
+  background:var(--cv-surf2);border:1px solid var(--cv-border);border-radius:7px;
+  padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:16px;
+}
+.cv .addr-bar .addr{font-size:11px;color:var(--cv-accent2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cv .copy-btn{background:none;border:1px solid var(--cv-border);border-radius:3px;color:var(--cv-muted);padding:3px 7px;font-size:10px;cursor:pointer;font-family:var(--mono);transition:all .15s;white-space:nowrap}
+.cv .copy-btn:hover{color:var(--cv-accent);border-color:var(--cv-accent)}
+
+.cv .total{font-family:var(--display);font-size:28px;font-weight:700;margin-bottom:3px}
+.cv .total-chg{font-size:11px;color:#00c880;margin-bottom:16px}
+
+/* Coin rows */
+.cv .coin-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:7px;background:var(--cv-surf2);border:1px solid transparent;
+  cursor:pointer;transition:all .12s;margin-bottom:2px;
+}
+.cv .coin-row:hover{border-color:var(--cv-border);transform:translateX(2px)}
+.cv .ci{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.cv .cn{font-size:13px;font-weight:500;font-family:var(--display)}
+.cv .ct{font-size:10px;color:var(--cv-muted)}
+.cv .cv-right{text-align:right;margin-left:auto}
+.cv .ca{font-size:12px}
+.cv .cval{font-size:11px;color:var(--cv-muted)}
+.cv .cc{font-size:10px;padding:1px 5px;border-radius:3px;margin-left:6px}
+.cv .cc.up{background:rgba(0,200,128,.1);color:#00c880}
+.cv .cc.down{background:rgba(255,107,53,.1);color:var(--cv-warn)}
+
+/* Actions */
+.cv .acts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.cv .act{
+  background:var(--cv-surf2);border:1px solid var(--cv-border);border-radius:7px;
+  padding:11px;display:flex;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--cv-text);
+  transition:all .15s;
+}
+.cv .act:hover{border-color:var(--cv-accent);color:var(--cv-accent)}
+
+/* Tabs */
+.cv .tabs{display:flex;gap:3px;margin-bottom:12px;background:var(--cv-surf2);border-radius:7px;padding:3px}
+.cv .tab{flex:1;padding:7px;border:none;background:none;border-radius:5px;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--cv-muted);transition:all .15s}
+.cv .tab.active{background:var(--cv-surf);color:var(--cv-text);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.cv .tab-c{display:none}
+.cv .tab-c.active{display:block}
+
+/* Tx rows */
+.cv .tx-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--cv-border)}
+.cv .tx-row:last-child{border-bottom:none}
+.cv .txi{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.cv .txi.send{background:rgba(255,107,53,.1)}
+.cv .txi.recv{background:rgba(0,229,160,.1)}
+.cv .tx-info{flex:1}
+.cv .tx-desc{font-size:12px;font-weight:500}
+.cv .tx-date{font-size:10px;color:var(--cv-muted)}
+.cv .tx-amt{font-size:12px}
+.cv .tx-amt.send{color:var(--cv-warn)}
+.cv .tx-amt.recv{color:var(--cv-accent)}
+
+.cv .warn-box{
+  background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.18);
+  border-radius:7px;padding:10px 12px;font-size:11px;
+  color:rgba(255,180,150,.85);margin-bottom:12px;display:flex;gap:8px;line-height:1.5;
+}
+
+.cv .logout-btn{
+  background:none;border:1px solid rgba(255,107,53,.25);border-radius:4px;
+  color:rgba(255,107,53,.6);padding:4px 9px;cursor:pointer;
+  font-family:var(--mono);font-size:10px;margin-left:auto;transition:all .15s;
+}
+.cv .logout-btn:hover{border-color:var(--cv-warn);color:var(--cv-warn)}
+
+/* ── OM styles ────────────────────────────────────────── */
+.om{padding:16px 14px;font-family:var(--mono)}
+
+.om .header{
+  display:flex;align-items:center;gap:10px;margin-bottom:24px;
+  border-bottom:2px solid var(--om-border);padding-bottom:16px;
+}
+.om-logo{
+  width:32px;height:32px;background:var(--om-accent);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:800;font-size:12px;color:#fff;
+  letter-spacing:.05em;
+}
+.om h1{font-family:var(--display);font-size:16px;font-weight:800;color:var(--om-text);letter-spacing:.02em}
+.om .sub{font-size:9px;color:var(--om-muted);letter-spacing:.1em;text-transform:uppercase}
+
+.om .card{
+  background:var(--om-surf);border:1px solid var(--om-border);
+  border-radius:10px;padding:18px;margin-bottom:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+.om .card-lbl{font-size:10px;letter-spacing:.14em;color:var(--om-muted);text-transform:uppercase;margin-bottom:12px}
+
+.om .total{font-family:var(--display);font-size:28px;font-weight:800;color:var(--om-text);margin-bottom:3px}
+.om .total span{color:var(--om-accent)}
+.om .total-sub{font-size:11px;color:var(--om-muted)}
+
+/* OM addr bar */
+.om .addr-bar{
+  background:var(--om-surf2);border:1px solid var(--om-border);border-radius:7px;
+  padding:8px 12px;display:flex;align-items:center;gap:8px;margin-bottom:12px;
+}
+.om .addr{font-size:10px;color:var(--om-accent2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.om .copy-btn{background:none;border:1px solid var(--om-border);border-radius:3px;color:var(--om-muted);padding:3px 7px;font-size:10px;cursor:pointer;font-family:var(--mono);transition:all .15s;white-space:nowrap}
+.om .copy-btn:hover{color:var(--om-accent);border-color:var(--om-accent)}
+
+/* OM Coin rows */
+.om .coin-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:7px;background:var(--om-surf2);border:1px solid transparent;
+  margin-bottom:2px;transition:all .12s;
+}
+.om .coin-row:hover{border-color:var(--om-border)}
+.om .ci{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.om .cn{font-size:13px;font-weight:600;font-family:var(--display);color:var(--om-text)}
+.om .ct{font-size:10px;color:var(--om-muted)}
+.om .om-right{text-align:right;margin-left:auto}
+.om .ca{font-size:12px;color:var(--om-text)}
+.om .cval{font-size:11px;color:var(--om-muted)}
+.om .cc{font-size:10px;padding:1px 5px;border-radius:3px;margin-left:6px}
+.om .cc.up{background:rgba(26,107,74,.1);color:var(--om-accent2)}
+.om .cc.down{background:rgba(192,57,43,.08);color:var(--om-warn)}
+
+/* OM Tabs */
+.om .tabs{display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid var(--om-border)}
+.om .tab{flex:1;padding:8px;border:none;background:none;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--om-muted);transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px}
+.om .tab.active{color:var(--om-accent);border-bottom-color:var(--om-accent)}
+.om .tab-c{display:none}
+.om .tab-c.active{display:block}
+
+/* OM Tx */
+.om .tx-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--om-border)}
+.om .tx-row:last-child{border-bottom:none}
+.om .txi{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.om .txi.recv{background:rgba(26,107,74,.1)}
+.om .tx-info{flex:1}
+.om .tx-desc{font-size:12px;font-weight:500;color:var(--om-text)}
+.om .tx-date{font-size:10px;color:var(--om-muted)}
+.om .tx-amt{font-size:12px}
+.om .tx-amt.recv{color:var(--om-accent2)}
+
+/* NEW TX animation */
+@keyframes flashIn{
+  0%{background:rgba(0,229,160,.2);transform:translateX(8px)}
+  100%{background:transparent;transform:translateX(0)}
+}
+.om .tx-row.new-tx{animation:flashIn .8s ease forwards}
+
+@keyframes flashInOm{
+  0%{background:rgba(201,146,42,.15);transform:translateX(-8px)}
+  100%{background:transparent;transform:translateX(0)}
+}
+.om .tx-row.new-om{animation:flashInOm .8s ease forwards}
+
+/* OM wallet address display block */
+.om .om-addresses .addr-item{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  background:var(--om-surf2);border-radius:6px;margin-bottom:6px;
+  border:1px solid var(--om-border);
+}
+.om .addr-item .coin-pill{
+  font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;
+  background:var(--om-surf);border:1px solid var(--om-border);min-width:30px;text-align:center;
+}
+.om .addr-item .addr-val{font-size:10px;color:var(--om-accent2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:break-all;white-space:normal;line-height:1.5}
+
+/* ── Modal (Send) ─────────────────────────────────────── */
+.modal-ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(5px);
+  z-index:200;align-items:center;justify-content:center;
+}
+.modal-ov.open{display:flex}
+.modal{
+  background:var(--cv-surf);border:1px solid var(--cv-border);
+  border-radius:14px;padding:24px;width:100%;max-width:400px;margin:16px;
+  animation:slideUp .2s ease;
+}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--cv-text)}
+.modal-close{background:none;border:none;color:var(--cv-muted);cursor:pointer;font-size:20px;line-height:1}
+
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;color:var(--cv-muted);margin-bottom:5px;letter-spacing:.08em}
+.fi{
+  width:100%;background:var(--cv-surf2);border:1px solid var(--cv-border);
+  border-radius:7px;padding:9px 12px;color:var(--cv-text);
+  font-family:var(--mono);font-size:12px;outline:none;transition:border-color .15s;
+}
+.fi:focus{border-color:var(--cv-accent)}
+.fsel{
+  width:100%;background:var(--cv-surf2);border:1px solid var(--cv-border);
+  border-radius:7px;padding:9px 12px;color:var(--cv-text);
+  font-family:var(--mono);font-size:12px;outline:none;cursor:pointer;
+}
+.fsel option{background:var(--cv-surf)}
+
+.fee-row{display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--cv-border);font-size:11px;color:var(--cv-muted)}
+
+/* MAX button */
+.amount-wrap{position:relative;display:flex;gap:6px;align-items:center}
+.amount-wrap .fi{flex:1}
+.max-btn{
+  flex-shrink:0;
+  background:transparent;
+  border:1px solid var(--cv-accent);
+  border-radius:5px;
+  color:var(--cv-accent);
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.08em;
+  padding:0 10px;
+  height:36px;
+  cursor:pointer;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.max-btn:hover{background:var(--cv-accent);color:#000}
+.max-btn:active{transform:scale(.96)}
+.max-btn.zero{border-color:var(--cv-muted);color:var(--cv-muted);pointer-events:none}
+
+/* OM dest display inside modal */
+.om-dest{
+  background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.2);
+  border-radius:7px;padding:10px 12px;margin-bottom:12px;
+}
+.om-dest-label{font-size:10px;color:var(--cv-accent);letter-spacing:.08em;margin-bottom:4px}
+.om-dest-addr{font-size:11px;color:var(--cv-text);word-break:break-all;line-height:1.4}
+
+/* ── Toast ────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);
+  background:var(--cv-surf);border:1px solid var(--cv-accent);
+  border-radius:7px;padding:10px 18px;font-size:12px;color:var(--cv-accent);
+  z-index:300;transition:transform .25s ease;white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Pulse badge on OM incoming */
+@keyframes pulseBadge{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.9)}}
+.new-badge{
+  display:inline-block;background:var(--cv-accent);color:#000;
+  font-size:9px;padding:1px 5px;border-radius:3px;margin-left:6px;
+  animation:pulseBadge .8s ease infinite;vertical-align:middle;
+}
+
+.info-block{font-size:11px;color:var(--om-muted);line-height:1.8}
+.info-block strong{color:var(--om-text)}
+
+@keyframes pendingDots{0%,20%{content:'bevestigen'}40%{content:'bevestigen.'}60%{content:'bevestigen..'}80%,100%{content:'bevestigen...'}}
+.om-pending-dots::after{content:'';animation:pendingDots 1.5s steps(1,end) infinite}
+.om-pending-dots{font-size:10px;color:var(--om-muted)}
+
+/* TRC-20 badge */
+.trc20-badge{
+  font-size:9px;background:rgba(255,0,19,.1);color:#ff4455;
+  border:1px solid rgba(255,0,19,.2);border-radius:3px;
+  padding:1px 4px;vertical-align:middle;margin-left:4px;font-weight:600;
+}
+
+/* ── Opdracht knop (links naast CryptoVault) ──────────── */
+.opdracht-btn-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  flex-shrink:0;
+  gap:8px;
+  padding-bottom:40px;
+}
+.opdracht-btn{
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  transform:rotate(180deg);
+  background:rgba(0,229,160,.08);
+  border:1px solid rgba(0,229,160,.2);
+  border-radius:8px;
+  color:var(--cv-accent);
+  font-family:var(--mono);
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  padding:14px 8px;
+  cursor:pointer;
+  transition:all .2s ease;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.opdracht-btn:hover{
+  background:rgba(0,229,160,.15);
+  border-color:rgba(0,229,160,.4);
+  box-shadow:0 0 16px rgba(0,229,160,.1);
+}
+.opdracht-btn-icon{
+  font-size:13px;
+  transform:rotate(180deg);
+}
+
+/* ── Opdracht popup modal ──────────────────────────────── */
+#opdracht-popup{
+  display:none;
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.75);
+  backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;
+  padding:24px;
+}
+#opdracht-popup.open{display:flex;}
+.opdracht-popup-card{
+  background:#0f1319;
+  border:1px solid #1e2535;
+  border-radius:16px;
+  max-width:580px;
+  width:100%;
+  padding:36px 40px;
+  position:relative;
+  box-shadow:0 0 60px rgba(0,229,160,.08), 0 24px 80px rgba(0,0,0,.8);
+  animation:slideUp .25s ease;
+  max-height:90vh;
+  overflow-y:auto;
+}
+.opdracht-popup-close{
+  position:absolute;top:16px;right:18px;
+  background:none;border:none;color:#2a3a50;
+  font-size:22px;cursor:pointer;line-height:1;
+  transition:color .15s;
+}
+.opdracht-popup-close:hover{color:var(--cv-muted);}
+
+/* ── Opdracht overlay ─────────────────────────────────── */
+#opdracht-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:#07090d;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:24px;
+  overflow-y:auto;
+}
+.opdracht-card{
+  background:#0f1319;
+  border:1px solid #1e2535;
+  border-radius:16px;
+  max-width:620px;
+  width:100%;
+  padding:40px 44px;
+  position:relative;
+  box-shadow:0 0 60px rgba(0,229,160,.06);
+  margin:auto;
+}
+.opdracht-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);
+  border-radius:6px;padding:5px 12px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  color:var(--cv-accent);text-transform:uppercase;margin-bottom:24px;
+}
+.opdracht-badge::before{content:'●';font-size:8px;animation:pulseBadge .9s ease infinite}
+.opdracht-title{
+  font-family:var(--display);font-size:22px;font-weight:800;
+  color:#dce8f5;margin-bottom:24px;letter-spacing:.01em;
+}
+.opdracht-body{
+  font-family:var(--mono);font-size:12.5px;color:#6a7f9a;
+  line-height:1.85;margin-bottom:28px;
+}
+.opdracht-body p{margin-bottom:14px}
+.opdracht-body p:last-child{margin-bottom:0}
+.opdracht-mnemonic{
+  background:#07090d;border:1px solid #1e2535;border-radius:8px;
+  padding:16px 18px;margin:16px 0;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px 16px;
+}
+.opdracht-mnemonic .mw{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:12px;
+}
+.opdracht-mnemonic .mw .mn{
+  color:#2a3a50;font-size:10px;min-width:16px;text-align:right;
+}
+.opdracht-mnemonic .mw .mv{color:#dce8f5;font-weight:500}
+.opdracht-warn{
+  background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.18);
+  border-radius:7px;padding:10px 14px;font-size:11px;
+  color:rgba(255,180,150,.85);display:flex;gap:8px;
+  line-height:1.5;margin-bottom:28px;
+}
+.opdracht-start{
+  width:100%;padding:14px;border-radius:9px;border:none;
+  background:#00e5a0;color:#000;
+  font-family:var(--mono),'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
+  letter-spacing:.06em;cursor:pointer;
+  transition:filter .15s, transform .15s;
+}
+.opdracht-start:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.opdracht-start:active{transform:translateY(0)}
+.opdracht-divider{
+  border:none;border-top:1px solid #1e2535;margin:22px 0;
+}
+
+/* ── Resultaat modals ─────────────────────────────────── */
+.result-ov{
+  display:none;position:fixed;inset:0;z-index:600;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;padding:24px;
+}
+.result-ov.open{display:flex}
+.result-card{
+  border-radius:18px;padding:48px 44px;max-width:520px;width:100%;
+  text-align:center;animation:slideUp .35s ease;position:relative;
+}
+.result-card.success{
+  background:#040f0a;
+  border:1px solid rgba(0,229,160,.3);
+  box-shadow:0 0 80px rgba(0,229,160,.12),0 0 20px rgba(0,229,160,.06);
+}
+.result-card.failure{
+  background:#100707;
+  border:1px solid rgba(255,107,53,.3);
+  box-shadow:0 0 80px rgba(255,107,53,.1),0 0 20px rgba(255,107,53,.05);
+}
+.result-icon{font-size:64px;margin-bottom:20px;display:block;line-height:1}
+.result-title{
+  font-family:var(--display);font-weight:800;font-size:26px;
+  margin-bottom:12px;letter-spacing:.01em;
+}
+.result-card.success .result-title{color:#00e5a0}
+.result-card.failure .result-title{color:#ff6b35}
+.result-sub{
+  font-family:var(--mono);font-size:12px;line-height:1.8;
+  margin-bottom:28px;
+}
+.result-card.success .result-sub{color:rgba(0,229,160,.6)}
+.result-card.failure .result-sub{color:rgba(255,180,150,.7)}
+.result-detail{
+  border-radius:9px;padding:14px 18px;margin-bottom:28px;
+  font-family:var(--mono);font-size:11px;line-height:1.8;text-align:left;
+}
+.result-card.success .result-detail{
+  background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.15);
+  color:rgba(0,229,160,.7);
+}
+.result-card.failure .result-detail{
+  background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.2);
+  color:rgba(255,180,150,.85);
+}
+.result-btn{
+  width:100%;padding:13px;border-radius:9px;border:none;
+  font-family:var(--mono);font-size:13px;font-weight:600;
+  letter-spacing:.05em;cursor:pointer;transition:all .15s;
+}
+.result-card.success .result-btn{background:#00e5a0;color:#000}
+.result-card.failure .result-btn{background:#ff6b35;color:#fff}
+.result-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.result-btn:active{transform:translateY(0)}
+@keyframes successPulse{
+  0%,100%{box-shadow:0 0 80px rgba(0,229,160,.12)}
+  50%{box-shadow:0 0 120px rgba(0,229,160,.22)}
+}
+.result-card.success{animation:slideUp .35s ease, successPulse 2.5s ease infinite}
+
+
+/* ── Taal schakelaar ──────────────────────────────────── */
+.lang-switch{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:2px;
+  background:#ffffff06;
+  border:1px solid #ffffff0c;
+  border-radius:5px;
+  padding:2px;
+}
+.lang-btn{
+  background:none;border:none;
+  color:#ffffff20;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.1em;padding:3px 8px;border-radius:3px;
+  cursor:pointer;transition:all .15s;
+}
+.lang-btn.active{
+  background:var(--cv-accent);color:#000;
+}
+.lang-btn:not(.active):hover{color:#ffffff50;}
+
+
+
+
+/* ── Theorie overlay ──────────────────────────────────── */
+#theorie-overlay {
+  position:fixed;inset:0;z-index:510;
+  background:#07090d;
+  display:none;align-items:flex-start;justify-content:center;
+  padding:24px;overflow-y:auto;
+}
+#theorie-overlay.open { display:flex; }
+.theorie-card {
+  background:#0f1319;border:1px solid #1e2535;border-radius:16px;
+  max-width:640px;width:100%;padding:36px 40px;margin:auto;
+  box-shadow:0 0 60px rgba(0,229,160,.06);
+}
+.theorie-tabs {
+  display:flex;gap:4px;margin-bottom:24px;
+  background:#07090d;border-radius:8px;padding:4px;
+}
+.theorie-tab {
+  flex:1;padding:9px 6px;border:none;border-radius:5px;
+  background:none;cursor:pointer;font-family:var(--mono);font-size:10px;
+  color:#3a4f6a;letter-spacing:.08em;transition:all .15s;text-align:center;
+}
+.theorie-tab.active { background:#161b24;color:var(--cv-accent);box-shadow:0 1px 4px rgba(0,0,0,.4); }
+.theorie-tab:not(.active):hover { color:#6a8fa8; }
+.theorie-panel { display:none; }
+.theorie-panel.active { display:block; }
+.theorie-h { font-family:var(--display);font-size:16px;font-weight:700;color:#dce8f5;margin-bottom:14px; }
+.theorie-body { font-family:var(--mono);font-size:12px;color:#6a7f9a;line-height:1.9;margin-bottom:14px; }
+.theorie-body strong { color:#dce8f5; }
+.theorie-body .tag {
+  display:inline-block;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);
+  color:var(--cv-accent);border-radius:4px;padding:1px 7px;font-size:10px;
+  font-weight:600;letter-spacing:.08em;margin:0 2px;vertical-align:middle;
+}
+.theorie-body .tag.warn {
+  background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.2);color:var(--cv-warn);
+}
+.theorie-nav {
+  display:flex;gap:8px;margin-top:24px;
+}
+.theorie-nav-btn {
+  flex:1;padding:11px;border-radius:8px;border:none;cursor:pointer;
+  font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;
+  transition:all .15s;
+}
+.theorie-nav-btn.prev { background:transparent;border:1px solid #1e2535;color:#3a4f6a; }
+.theorie-nav-btn.prev:hover { border-color:#2a3545;color:#6a8fa8; }
+.theorie-nav-btn.next { background:var(--cv-accent);color:#000; }
+.theorie-nav-btn.next:hover { filter:brightness(1.1); }
+.theorie-dots {
+  display:flex;align-items:center;justify-content:center;gap:6px;margin-top:16px;
+}
+.theorie-dot {
+  width:6px;height:6px;border-radius:50%;
+  background:#1e2535;transition:all .2s;cursor:pointer;
+}
+.theorie-dot.active { background:var(--cv-accent);transform:scale(1.3); }
+
+/* ── Scenario overlay ─────────────────────────────────── */
+#scenario-overlay {
+  position:fixed;inset:0;z-index:510;
+  background:#07090d;
+  display:none;align-items:flex-start;justify-content:center;
+  padding:24px;overflow-y:auto;
+}
+#scenario-overlay.open { display:flex; }
+.scenario-card {
+  background:#0f1319;border:1px solid #1e2535;border-radius:16px;
+  max-width:580px;width:100%;padding:36px 40px;margin:auto;
+  box-shadow:0 0 60px rgba(0,229,160,.06);
+}
+.scenario-grid { display:flex;flex-direction:column;gap:10px;margin:20px 0; }
+.scenario-item {
+  background:#07090d;border:1px solid #1e2535;border-radius:10px;
+  padding:16px 18px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:flex-start;gap:14px;
+}
+.scenario-item:hover { border-color:rgba(0,229,160,.3);background:#0c1018; }
+.scenario-item.selected { border-color:var(--cv-accent);background:rgba(0,229,160,.05); }
+.scenario-num {
+  width:28px;height:28px;border-radius:50%;background:#161b24;
+  border:1px solid #1e2535;display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:800;font-size:12px;color:#3a4f6a;
+  flex-shrink:0;margin-top:1px;transition:all .2s;
+}
+.scenario-item.selected .scenario-num { background:var(--cv-accent);color:#000;border-color:var(--cv-accent); }
+.scenario-title { font-family:var(--display);font-size:13px;font-weight:700;color:#dce8f5;margin-bottom:4px; }
+.scenario-desc { font-size:10px;color:#3a4f6a;line-height:1.6; }
+.scenario-coins { display:flex;gap:4px;margin-top:6px;flex-wrap:wrap; }
+.scenario-coin {
+  font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;
+  background:#161b24;border:1px solid #1e2535;color:#6a8fa8;letter-spacing:.06em;
+}
+.scenario-coin.highlight { background:rgba(0,229,160,.08);border-color:rgba(0,229,160,.2);color:var(--cv-accent); }
+.scenario-diff {
+  font-size:9px;letter-spacing:.1em;padding:2px 7px;border-radius:3px;
+  font-weight:700;text-transform:uppercase;margin-left:auto;flex-shrink:0;
+}
+.diff-1 { background:rgba(0,200,128,.1);color:#00c880;border:1px solid rgba(0,200,128,.2); }
+.diff-2 { background:rgba(243,186,47,.1);color:#f3ba2f;border:1px solid rgba(243,186,47,.2); }
+.diff-3 { background:rgba(255,107,53,.1);color:var(--cv-warn);border:1px solid rgba(255,107,53,.2); }
+
+/* ── Voortgangsindicator ──────────────────────────────── */
+#voortgang-bar {
+  display:none;
+  position:fixed;top:44px;left:0;right:0;z-index:9;
+  background:#0a0c12;border-bottom:1px solid #1e2535;
+  padding:7px 20px;align-items:center;gap:12px;
+}
+#voortgang-bar.visible { display:flex; }
+.voortgang-label {
+  font-family:var(--mono);font-size:9px;color:#2a3a50;letter-spacing:.12em;
+  text-transform:uppercase;flex-shrink:0;
+}
+.voortgang-coins { display:flex;gap:5px;align-items:center;flex:1;flex-wrap:wrap; }
+.vcoin {
+  font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;
+  letter-spacing:.06em;transition:all .3s;border:1px solid;
+}
+.vcoin.pending { background:#0f1319;border-color:#1e2535;color:#2a3a50; }
+.vcoin.done { background:rgba(0,200,128,.12);border-color:rgba(0,200,128,.3);color:#00c880; }
+.voortgang-tijd {
+  font-family:var(--mono);font-size:9px;color:#2a3a50;letter-spacing:.1em;
+  flex-shrink:0;
+}
+@keyframes coinDone {
+  0%   { transform:scale(1); }
+  50%  { transform:scale(1.25); }
+  100% { transform:scale(1); }
+}
+.vcoin.just-done { animation:coinDone .4s ease; }
+
+/* ── Pogingen logboek in success modal ───────────────── */
+.logboek-block {
+  background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.1);
+  border-radius:8px;padding:12px 14px;margin-top:12px;text-align:left;
+}
+.logboek-title {
+  font-family:var(--display);font-size:11px;font-weight:700;
+  color:rgba(0,229,160,.5);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;
+}
+.logboek-row {
+  display:flex;align-items:center;gap:8px;padding:4px 0;
+  border-bottom:1px solid rgba(0,229,160,.07);font-size:10px;
+  font-family:var(--mono);
+}
+.logboek-row:last-child { border-bottom:none; }
+.logboek-poging { color:rgba(0,229,160,.4);min-width:60px; }
+.logboek-tijd { color:rgba(0,229,160,.7);min-width:50px; }
+.logboek-status { color:rgba(0,229,160,.5);flex:1; }
+.logboek-status.fout { color:rgba(255,107,53,.6); }
+
+/* ── Leermomenten ──────────────────────────────────────── */
+.learn-btn {
+  background: rgba(0,229,160,.12) !important;
+  border: 1px solid rgba(0,229,160,.35) !important;
+  color: var(--cv-accent) !important;
+  font-size: 13px !important;
+}
+.learn-btn:hover { background: rgba(0,229,160,.2) !important; }
+
+.learn-block {
+  background: rgba(0,229,160,.04);
+  border: 1px solid rgba(0,229,160,.12);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.learn-topic {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cv-accent);
+  margin-bottom: 8px;
+  letter-spacing: .02em;
+}
+.learn-icon {
+  font-size: 16px;
+}
+.learn-question {
+  font-size: 11px;
+  color: rgba(220,232,245,.7);
+  font-style: italic;
+  margin-bottom: 10px;
+  line-height: 1.6;
+  padding-left: 24px;
+  border-left: 2px solid rgba(0,229,160,.2);
+}
+.learn-answer {
+  font-size: 11px;
+  color: rgba(0,229,160,.6);
+  line-height: 1.8;
+}
+
+/* ── Hint animaties ───────────────────────────────────── */
+@keyframes hintPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(0,229,160,0), transform: none; }
+  30%  { box-shadow: 0 0 0 6px rgba(0,229,160,.25); }
+  60%  { box-shadow: 0 0 0 10px rgba(0,229,160,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,229,160,0); }
+}
+@keyframes hintGlow {
+  0%,100% { border-color: var(--cv-border); color: var(--cv-muted); background: transparent; }
+  50%     { border-color: var(--cv-accent); color: var(--cv-accent); background: rgba(0,229,160,.07); }
+}
+.hint-pulse {
+  animation: hintPulse 1.4s ease-out infinite, hintGlow 1.4s ease-in-out infinite !important;
+}
+/* hint tooltip bubble */
+.hint-bubble {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #0f1319;
+  border: 1px solid rgba(0,229,160,.3);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 10px;
+  color: var(--cv-accent);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+  font-family: var(--mono);
+  letter-spacing: .04em;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  z-index: 50;
+}
+.hint-bubble::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left-color: rgba(0,229,160,.3);
+}
+.hint-bubble.show { opacity: 1; }
+/* wrapper needed for positioning */
+.hint-wrap { position: relative; }
+
+/* ── Fallback hardcoded kleuren voor als CSS variabelen niet laden ── */
+.cv .btn-p, .theorie-nav-btn.next, #sc-start-btn,
+.gasfree-btn-send { background:#00e5a0 !important; color:#000 !important; }
+.lang-btn.active { background:#00e5a0 !important; color:#000 !important; }
+.theorie-dot.active { background:#00e5a0 !important; }
+.scenario-item.selected { border-color:#00e5a0 !important; background:rgba(0,229,160,.05) !important; }
+.scenario-item.selected .scenario-num { background:#00e5a0 !important; color:#000 !important; border-color:#00e5a0 !important; }
+
+/* responsive handled above */
+</style>
+</head>
+<body>
+
+<!-- ═══ WACHTWOORD SCHERM ═══ -->
+<div id="pw-screen" style="
+  position:fixed;inset:0;z-index:9999;
+  background:radial-gradient(ellipse at 30% 20%, #1a1f2e 0%, #0a0c12 60%, #000 100%);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+">
+  <div style="
+    background:#0f1319;border:1px solid #1e2535;border-radius:16px;
+    max-width:380px;width:100%;padding:40px 36px;
+    box-shadow:0 0 60px rgba(0,229,160,.08),0 24px 80px rgba(0,0,0,.8);
+    text-align:center;
+  ">
+    <div style="font-size:36px;margin-bottom:16px">🔐</div>
+    <div style="font-family:system-ui,sans-serif;font-size:18px;font-weight:800;color:#dce8f5;margin-bottom:6px;letter-spacing:.02em">Crypto Wallet Training</div>
+    <div style="font-family:monospace;font-size:10px;color:#2a3a50;letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px">Voer het wachtwoord in om te starten</div>
+    <input id="pw-input" type="password"
+      placeholder="wachtwoord…"
+      style="
+        width:100%;background:#07090d;border:1px solid #1e2535;border-radius:8px;
+        padding:11px 14px;color:#dce8f5;font-family:monospace;
+        font-size:13px;outline:none;margin-bottom:10px;
+        transition:border-color .15s;box-sizing:border-box;
+      "
+      onfocus="this.style.borderColor='rgba(0,229,160,.4)'"
+      onblur="this.style.borderColor='#1e2535'"
+    />
+    <div id="pw-error" style="font-family:monospace;font-size:11px;color:#ff6b35;margin-bottom:10px;min-height:16px"></div>
+    <button id="pw-btn" style="
+      width:100%;padding:12px;border-radius:8px;border:none;
+      background:#00e5a0;color:#000;font-family:monospace;
+      font-size:13px;font-weight:600;letter-spacing:.06em;cursor:pointer;
+    ">
+      Toegang →
+    </button>
+  </div>
+</div>
+
+<script>
+(function() {
+  var PW = 'wlx#tx298dabgetla!';
+  function doCheck() {
+    var val = document.getElementById('pw-input').value;
+    var err = document.getElementById('pw-error');
+    if (val === PW) {
+      document.getElementById('pw-screen').style.display = 'none';
+    } else {
+      err.textContent = '✗ Onjuist wachtwoord — probeer opnieuw';
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+      setTimeout(function(){ err.textContent = ''; }, 3000);
+    }
+  }
+  document.getElementById('pw-btn').addEventListener('click', doCheck);
+  document.getElementById('pw-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doCheck();
+  });
+})();
+</script>
+
+<!-- ═══ OPDRACHT OVERLAY ═══ -->
+<div id="opdracht-overlay">
+  <div class="opdracht-card">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+      <div class="lang-switch">
+        <button class="lang-btn active" id="btn-nl-overlay" onclick="setLang('nl')">NL</button>
+        <button class="lang-btn" id="btn-en-overlay" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+    <div class="opdracht-badge">Oefening Inbeslagneming Cryptovaluta</div>
+    <div class="opdracht-title">Opdracht</div>
+    <div class="opdracht-body">
+      <p>Door het team is een woordenlijst van 12 woorden aangetroffen, een zogenaamde <strong style="color:#dce8f5">mnemonic</strong>. Te weten:</p>
+
+      <div class="opdracht-mnemonic">
+        <div class="mw"><span class="mn">1</span><span class="mv">abandon</span></div>
+        <div class="mw"><span class="mn">2</span><span class="mv">ability</span></div>
+        <div class="mw"><span class="mn">3</span><span class="mv">able</span></div>
+        <div class="mw"><span class="mn">4</span><span class="mv">about</span></div>
+        <div class="mw"><span class="mn">5</span><span class="mv">above</span></div>
+        <div class="mw"><span class="mn">6</span><span class="mv">absent</span></div>
+        <div class="mw"><span class="mn">7</span><span class="mv">absorb</span></div>
+        <div class="mw"><span class="mn">8</span><span class="mv">abstract</span></div>
+        <div class="mw"><span class="mn">9</span><span class="mv">absurd</span></div>
+        <div class="mw"><span class="mn">10</span><span class="mv">abuse</span></div>
+        <div class="mw"><span class="mn">11</span><span class="mv">access</span></div>
+        <div class="mw"><span class="mn">12</span><span class="mv">accident</span></div>
+      </div>
+
+      <p>Noteer deze mnemonic en ga er zorgvuldig mee om.</p>
+
+      <hr class="opdracht-divider">
+
+      <p>De wallet die in gebruik was betrof een <strong style="color:#dce8f5">CryptoVault-wallet</strong>. Echter deze wallet is niet aangetroffen. Het is aan jou om alle tegoeden in deze wallet over te maken naar de <strong style="color:#dce8f5">OM-wallet</strong>.</p>
+
+      <p>Je kunt daar een eigen wallet voor gebruiken. Als je begint met de opdracht zie je jouw CryptoVault-wallet naast de OM-wallet staan.</p>
+
+      <p>Voer deze opdracht zodanig uit dat er <strong style="color:var(--cv-accent)">GEEN saldo in de CryptoVault wallet achterblijft</strong>. Binnen de OM-wallet is al een case aangemaakt met benodigde adressen waar de cryptocurrency naar toe kan worden gestuurd.</p>
+    </div>
+
+    <div class="opdracht-warn">
+      <span>⚠️</span>
+      <span>Dit is een gesimuleerde oefenomgeving. Er worden geen echte transacties uitgevoerd en er gaat geen echt geld om.</span>
+    </div>
+
+    <button class="opdracht-start" onclick="naarTheorie()" data-i18n="opdracht_start_btn">Begin met de opdracht →</button>
+  </div>
+</div>
+
+
+<!-- ═══ THEORIE OVERLAY ═══ -->
+<div id="theorie-overlay">
+  <div class="theorie-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div class="opdracht-badge" style="margin-bottom:0" id="theorie-badge">📚 Theorie</div>
+      <span style="font-family:var(--mono);font-size:10px;color:#2a3a50" id="theorie-step-label">1 / 3</span>
+    </div>
+
+    <!-- Tab buttons -->
+    <div class="theorie-tabs">
+      <button class="theorie-tab active" onclick="naarTheorieTab(0)" id="tt0" data-i18n="th_tab0">Wallets &amp; Mnemonics</button>
+      <button class="theorie-tab" onclick="naarTheorieTab(1)" id="tt1" data-i18n="th_tab1">Coins &amp; Tokens</button>
+      <button class="theorie-tab" onclick="naarTheorieTab(2)" id="tt2" data-i18n="th_tab2">Gas &amp; Volgorde</button>
+    </div>
+
+    <!-- Panel 0: Wallets & Mnemonics -->
+    <div class="theorie-panel active" id="tp0">
+      <div class="theorie-h" data-i18n="th0_h">Wat is een crypto wallet?</div>
+      <div class="theorie-body" data-i18n="th0_b">
+        Een crypto wallet slaat geen munten op — het beheert je <strong>privésleutel</strong>. Met die sleutel kun je transacties ondertekenen en aantonen dat de crypto van jou is.<br><br>
+        Een <strong>mnemonic</strong> (ook wel <em>seed phrase</em>) is een reeks van 12 of 24 gewone woorden die jouw privésleutel vertegenwoordigt. Wie deze woorden kent, heeft volledige toegang tot de wallet.<br><br>
+        Via de standaard <span class="tag">BIP-39</span> → <span class="tag">BIP-44</span> afleiding worden uit de mnemonic altijd dezelfde adressen gegenereerd — op elk apparaat, in elke wallet-app.
+      </div>
+      <div style="background:#07090d;border:1px solid #1e2535;border-radius:7px;padding:12px 14px;font-size:11px;color:#3a4f6a;line-height:1.7" data-i18n="th0_tip">
+        <strong style="color:#dce8f5">Bij inbeslagneming:</strong> een gevonden mnemonic geeft directe toegang tot alle tegoeden. Het is cruciaal deze veilig te noteren en zo snel mogelijk over te maken naar een gecustodied adres.
+      </div>
+    </div>
+
+    <!-- Panel 1: Coins & Tokens -->
+    <div class="theorie-panel" id="tp1">
+      <div class="theorie-h" data-i18n="th1_h">Native coins vs. tokens</div>
+      <div class="theorie-body" data-i18n="th1_b">
+        Een <strong>native coin</strong> is de oorspronkelijke munt van een blockchain. Voorbeelden: <span class="tag">ETH</span> op Ethereum, <span class="tag">TRX</span> op Tron, <span class="tag">BNB</span> op BNB Chain.<br><br>
+        Een <strong>token</strong> is een digitaal tegoed dat <em>bovenop</em> een bestaande blockchain draait. Voorbeeld: <span class="tag">USDT (TRC-20)</span> draait op de Tron blockchain.<br><br>
+        Het cruciale verschil: tokens hebben de native coin van hun blockchain nodig om te kunnen worden verstuurd. Zonder <span class="tag">TRX</span> kun je geen <span class="tag">USDT (TRC-20)</span> versturen — ook al heb je genoeg USDT.
+      </div>
+      <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.15);border-radius:7px;padding:12px 14px;font-size:11px;color:rgba(255,180,150,.8);line-height:1.7" data-i18n="th1_tip">
+        <strong style="color:var(--cv-warn)">Valkuil:</strong> TRX eerst versturen en daarna USDT proberen → de USDT zit vast. Er is geen gas meer om de transactie te betalen.
+      </div>
+    </div>
+
+    <!-- Panel 2: Gas & Volgorde -->
+    <div class="theorie-panel" id="tp2">
+      <div class="theorie-h" data-i18n="th2_h">Gas fees &amp; de juiste volgorde</div>
+      <div class="theorie-body" data-i18n="th2_b">
+        Elke transactie op een blockchain kost een kleine <strong>gas fee</strong>. Deze fee wordt altijd betaald in de native coin van die blockchain — ook als je een token verstuurt.<br><br>
+        De juiste volgorde bij inbeslagneming met tokens:
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;background:#07090d;border:1px solid #1e2535;border-radius:7px;padding:10px 12px">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--cv-accent);color:#000;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex-shrink:0">1</div>
+          <div style="font-size:11px;color:#dce8f5;font-family:var(--mono)" data-i18n="th2_step1">Verstuur eerst de <span class="tag">tokens</span> (bijv. USDT)</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:#07090d;border:1px solid #1e2535;border-radius:7px;padding:10px 12px">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--cv-accent);color:#000;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex-shrink:0">2</div>
+          <div style="font-size:11px;color:#dce8f5;font-family:var(--mono)" data-i18n="th2_step2">Verstuur daarna de <span class="tag">native coin</span> (bijv. TRX)</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:#07090d;border:1px solid #1e2535;border-radius:7px;padding:10px 12px">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--cv-accent);color:#000;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex-shrink:0">3</div>
+          <div style="font-size:11px;color:#dce8f5;font-family:var(--mono)" data-i18n="th2_step3">Gebruik de <span class="tag">MAX knop</span> om niets achter te laten</div>
+        </div>
+      </div>
+      <div style="background:rgba(0,229,160,.05);border:1px solid rgba(0,229,160,.15);border-radius:7px;padding:12px 14px;font-size:11px;color:rgba(0,229,160,.7);line-height:1.7" data-i18n="th2_tip">
+        <strong style="color:var(--cv-accent)">Tip:</strong> de volgorde van BTC, ETH, SOL en BNB maakt niet uit — dat zijn allemaal native coins zonder token-afhankelijkheid.
+      </div>
+    </div>
+
+    <!-- Dots + Nav -->
+    <div class="theorie-dots">
+      <div class="theorie-dot active" onclick="naarTheorieTab(0)" id="td0"></div>
+      <div class="theorie-dot" onclick="naarTheorieTab(1)" id="td1"></div>
+      <div class="theorie-dot" onclick="naarTheorieTab(2)" id="td2"></div>
+    </div>
+    <div class="theorie-nav">
+      <button class="theorie-nav-btn prev" id="theorie-prev" onclick="theorieVorige()" style="display:none" data-i18n="th_prev">← Vorige</button>
+      <button class="theorie-nav-btn next" id="theorie-next" onclick="theorieVolgende()" data-i18n="th_next">Volgende →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCENARIO OVERLAY ═══ -->
+<div id="scenario-overlay">
+  <div class="scenario-card">
+    <div class="opdracht-badge" style="margin-bottom:16px" data-i18n="sc_badge">🎯 Kies een scenario</div>
+    <div class="opdracht-title" data-i18n="sc_title">Welk scenario wil je oefenen?</div>
+    <div style="font-family:var(--mono);font-size:11px;color:#3a4f6a;margin-bottom:4px;line-height:1.7" data-i18n="sc_desc">Elk scenario heeft dezelfde mnemonic maar een andere coins-mix en moeilijkheidsgraad.</div>
+
+    <div class="scenario-grid" id="scenario-grid"></div>
+
+    <button class="opdracht-start" id="sc-start-btn" onclick="startScenario()" data-i18n="sc_start">Start oefening →</button>
+  </div>
+</div>
+
+<!-- ═══ VOORTGANGSBALK ═══ -->
+<div id="voortgang-bar">
+  <span class="voortgang-label" data-i18n="vb_label">Voortgang</span>
+  <div class="voortgang-coins" id="voortgang-coins"></div>
+  <span class="voortgang-tijd" id="voortgang-tijd">00:00</span>
+</div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-title">Dual Crypto Wallet</div>
+  <div class="edu-badge" id="tb-edu-badge" data-i18n="edu_badge">EDUCATIEF</div>
+  <div class="net-badge" id="tb-net-badge" style="margin-left:auto" data-i18n="net_badge">● DEMO NETWERK — GEEN ECHTE FONDSEN</div>
+  <div class="lang-switch">
+    <button class="lang-btn active" id="btn-nl" onclick="setLang('nl')">NL</button>
+    <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+  </div>
+</div>
+
+<!-- ═══ DESK SCENE ═══ -->
+<div class="desk-scene">
+
+<!-- Opdracht knop links -->
+<div class="opdracht-btn-wrap">
+  <button class="opdracht-btn" onclick="openOpdrachtPopup()">
+    <span class="opdracht-btn-icon">📋</span><span data-i18n="opdracht_btn">Opdracht bekijken</span>
+  </button>
+</div>
+
+<!-- Phone 1: CryptoVault -->
+<div class="phone-wrap">
+  <div class="phone-label">CryptoVault</div>
+  <div class="phone-frame cv-frame">
+    <div class="phone-bezel">
+      <div class="phone-notch"><div class="speaker"></div><div class="cam"></div></div>
+      <div class="phone-status">
+        <span class="status-time" id="clock-cv">09:41</span>
+        <span class="status-icons">▲ ◆ </span>
+      </div>
+      <div class="phone-screen">
+        <div class="panel panel-cv" id="panelCV">
+<div class="cv">
+
+  <div class="header">
+    <div class="logo">⬡</div>
+    <div>
+      <h1>CryptoVault</h1>
+    </div>
+    <span class="net">DEMO NET</span>
+  </div>
+
+  <!-- SCREEN: Welcome -->
+  <div id="cv-welcome" class="screen active">
+    <div class="card">
+      <div class="card-lbl" data-i18n="cv_welcome_lbl">Welkom</div>
+      <p style="color:var(--cv-muted);font-size:12px;margin-bottom:16px;line-height:1.6">
+        <span data-i18n="cv_welcome_desc">Herstel of genereer een wallet. Verstuur daarna crypto naar de <strong style="color:var(--cv-accent)">OM-Wallet</strong> rechts.</span>
+      </p>
+      <div class="warn-box"><span>⚠️</span><span data-i18n="cv_edu_warn">Uitsluitend voor educatieve doeleinden. Gebruik nooit echte seed phrases.</span></div>
+      <button class="btn btn-p" id="btn-generate" onclick="cvGenerateNew()" data-i18n="cv_btn_generate">✨ Genereer Nieuwe Wallet</button>
+      <div class="hint-wrap"><div class="hint-bubble" id="hint-bubble-restore"></div><button class="btn btn-s" id="btn-restore" onclick="cvShowScreen('cv-recover')" data-i18n="cv_btn_restore">🔑 Herstel met Mnemonic</button></div>
+    </div>
+    <div class="card">
+      <div class="card-lbl" data-i18n="cv_mnemonic_lbl">Wat is een Mnemonic?</div>
+      <p style="color:var(--cv-muted);font-size:11px;line-height:1.7"><span data-i18n="cv_mnemonic_desc">Een <strong style="color:var(--cv-text)">seed phrase</strong> (BIP-39) bestaat uit 12–24 woorden waarmee je wallet volledig hersteld kan worden. Via PBKDF2 → HD-key (BIP-44) wordt een uniek adres afgeleid.</span></p>
+    </div>
+  </div>
+
+  <!-- SCREEN: Recover -->
+  <div id="cv-recover" class="screen">
+    <div class="card">
+      <div class="card-lbl" data-i18n="cv_recover_lbl">Voer 12 Mnemonic woorden in</div>
+      <div class="mg" id="cv-mg"></div>
+      <div id="cv-recover-errors" style="display:none;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);border-radius:7px;padding:11px 14px;margin-bottom:12px;font-size:11px;line-height:1.8;color:rgba(255,180,150,.95)"></div>
+      <div class="warn-box"><span>💡</span><span data-i18n="cv_recover_hint">Voer de 12 woorden van je seed phrase in, één woord per veld.</span></div>
+      <button class="btn btn-p" id="btn-do-restore" onclick="cvRecover()" data-i18n="cv_btn_do_restore">Wallet Herstellen</button>
+      <button class="btn btn-s" onclick="cvShowScreen('cv-welcome')" style="color:var(--cv-muted)" data-i18n="cv_btn_back">← Terug</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: New wallet phrase display -->
+  <div id="cv-newwallet" class="screen">
+    <div class="card">
+      <div class="card-lbl" data-i18n="cv_newwallet_lbl">⚠ Bewaar deze recovery phrase</div>
+      <div class="warn-box"><span>🔒</span><span data-i18n="cv_newwallet_warn">Schrijf deze 12 woorden op in de juiste volgorde. Verlies je ze, verlies je permanent toegang tot je wallet.</span></div>
+      <div id="cv-newphrase-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px"></div>
+      <button class="btn btn-p" onclick="cvConfirmNewWallet()" data-i18n="cv_btn_confirm_wallet">Ik heb de woorden genoteerd — Open Wallet</button>
+      <button class="btn btn-s" onclick="cvShowScreen('cv-welcome')" style="color:var(--cv-muted)" data-i18n="cv_btn_cancel">← Annuleren</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: Dashboard -->
+  <div id="cv-dash" class="screen">
+    <div class="addr-bar">
+      <span style="font-size:16px">👛</span>
+      <span class="addr" id="cv-addr">0x…</span>
+      <button class="copy-btn" onclick="cvCopyAddr()" data-i18n="cv_btn_copy">Kopieer</button>
+      <button class="logout-btn" onclick="cvLogout()" data-i18n="cv_btn_logout">Uit</button>
+    </div>
+    <div class="card">
+      <div class="card-lbl" data-i18n="cv_portfolio_lbl">Portfolio</div>
+      <div class="total">€<span id="cv-total">0</span></div>
+      <div class="total-chg" id="cv-chg">+€0 (0%)</div>
+      <div class="acts" style="margin-top:14px">
+        <div class="act" id="act-send" onclick="openSend()" data-i18n="cv_act_send">↑ Versturen</div>
+        <div class="act" onclick="showToast(t('dyn_toast_qr'))" data-i18n="cv_act_receive">↓ Ontvangen</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="cvTab('assets')" data-i18n="tab_assets">Assets</button>
+      <button class="tab" onclick="cvTab('txs')" data-i18n="tab_txs">Transacties</button>
+      <button class="tab" onclick="cvTab('info')" data-i18n="tab_info">Info</button>
+    </div>
+    <div id="cv-tab-assets" class="tab-c active">
+      <div class="card" style="padding:12px">
+        <div id="cv-coinlist"></div>
+      </div>
+    </div>
+    <div id="cv-tab-txs" class="tab-c">
+      <div class="card" style="padding:12px">
+        <div id="cv-txlist"></div>
+      </div>
+    </div>
+    <div id="cv-tab-info" class="tab-c">
+      <div class="card">
+        <div class="card-lbl" data-i18n="cv_keys_lbl">Afgeleide Sleutels</div>
+        <div style="font-size:10px;color:var(--cv-muted);line-height:2;word-break:break-all">
+          <div><span style="color:var(--cv-accent2)" data-i18n="dyn_pad_label">Pad:</span> m/44'/60'/0'/0/0</div>
+          <div><span style="color:var(--cv-accent2)" data-i18n="dyn_addr_label">Adres:</span> <span id="cv-addr-full">—</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-lbl" data-i18n="cv_bip_lbl">BIP-39 / BIP-44 Uitleg</div>
+        <p style="font-size:11px;color:var(--cv-muted);line-height:1.7"><span data-i18n="cv_bip_desc">Mnemonic → PBKDF2 (512-bit seed) → HMAC-SHA512 master key → elliptische curve (secp256k1) → Keccak-256 hash → adres.</span></p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .cv -->
+        </div><!-- panel-cv -->
+      </div><!-- phone-screen -->
+      <div class="phone-home"><div class="phone-home-bar"></div></div>
+    </div><!-- phone-bezel -->
+  </div><!-- phone-frame cv-frame -->
+</div><!-- phone-wrap -->
+
+<!-- TX Flow connector -->
+<div class="phone-connector">
+  <div class="arrow-anim">
+    <div class="arrow-dot"></div>
+    <div class="arrow-dot"></div>
+    <div class="arrow-dot"></div>
+    <div class="arrow-dot"></div>
+  </div>
+  <div class="connector-label">TX</div>
+</div>
+
+<!-- Phone 2: OM-Wallet -->
+<div class="phone-wrap">
+  <div class="phone-label" data-i18n="om_wallet_label">OM-Wallet</div>
+  <div class="phone-frame om-frame">
+    <div class="phone-bezel">
+      <div class="phone-notch"><div class="speaker"></div><div class="cam"></div></div>
+      <div class="phone-status">
+        <span class="status-time" id="clock-om">09:41</span>
+        <span class="status-icons">▲ ◆ </span>
+      </div>
+      <div class="phone-screen">
+        <div class="panel panel-om" id="panelOM">
+<div class="om">
+
+  <div class="header">
+    <div class="om-logo">OM</div>
+    <div>
+      <h1>OM-Wallet</h1>
+      <div class="sub" data-i18n="om_sub_title">Ontvangst Wallet</div>
+    </div>
+    <div style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--om-muted);background:var(--om-surf2);border:1px solid var(--om-border);border-radius:5px;padding:4px 10px;letter-spacing:.08em;white-space:nowrap">Case F162534</div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl" data-i18n="om_portfolio_lbl">Portfolio Waarde</div>
+    <div class="total">€<span id="om-total" style="color:var(--om-accent)">0.00</span></div>
+    <div class="total-sub" id="om-sub" data-i18n="om_waiting">Wacht op inkomende transacties…</div>
+  </div>
+
+  <!-- OM Addresses per coin -->
+  <div class="card">
+    <div class="card-lbl" data-i18n="om_addresses_lbl">Ontvangstadressen (klik om te kopiëren)</div>
+    <div class="om-addresses" id="om-addresses"></div>
+    <p style="font-size:10px;color:var(--om-muted);margin-top:8px;line-height:1.5"><span data-i18n="om_addresses_hint">Gebruik deze adressen in de CryptoVault (links) om crypto te ontvangen op de OM-Wallet.</span></p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="omTab('assets')" data-i18n="tab_assets">Assets</button>
+    <button class="tab" onclick="omTab('txs')"><span data-i18n="tab_txs">Transacties</span> <span id="om-tx-badge" style="display:none" class="new-badge" data-i18n="om_tx_badge">NIEUW</span></button>
+  </div>
+
+  <div id="om-tab-assets" class="tab-c active">
+    <div class="card" style="padding:12px">
+      <div id="om-coinlist"></div>
+    </div>
+  </div>
+
+  <div id="om-tab-txs" class="tab-c">
+    <div class="card" style="padding:12px">
+      <div id="om-txlist">
+        <p style="font-size:11px;color:var(--om-muted);text-align:center;padding:20px" data-i18n="om_no_txs">Nog geen transacties ontvangen</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .om -->
+        </div><!-- panel-om -->
+      </div><!-- phone-screen -->
+      <div class="phone-home"><div class="phone-home-bar"></div></div>
+    </div><!-- phone-bezel -->
+  </div><!-- phone-frame om-frame -->
+</div><!-- phone-wrap -->
+
+</div><!-- desk-scene -->
+
+<!-- ═══ VERKEERDE KEUZE MODAL ═══ -->
+<div class="result-ov" id="wrongChoiceModal">
+  <div class="result-card failure">
+    <span class="result-icon">⚠️</span>
+    <div class="result-title" data-i18n="wrong_title">Onjuiste Keuze</div>
+    <div class="result-sub" data-i18n="wrong_sub">Je hebt een nieuwe, lege wallet aangemaakt.<br>Dit was niet de bedoeling.</div>
+    <div class="result-detail" id="wrong-detail" data-i18n="wrong_detail"></div>
+    <button class="result-btn" onclick="sluitWrongChoice()" data-i18n="wrong_btn">↩ Terug — herstel met de juiste mnemonic</button>
+  </div>
+</div>
+
+<!-- ═══ SUCCES MODAL ═══ -->
+<div class="result-ov" id="successModal">
+  <div class="result-card success" style="max-width:560px">
+
+    <!-- ── Succes scherm ── -->
+    <div id="success-view">
+      <span class="result-icon">✅</span>
+      <div class="result-title" data-i18n="success_title">Opdracht Geslaagd!</div>
+      <div class="result-sub" data-i18n="success_sub">Alle tegoeden zijn succesvol overgemaakt<br>naar de OM-Wallet. De CryptoVault is leeg.</div>
+      <div class="result-detail" id="success-detail"></div>
+      <div class="logboek-block" id="logboek-block" style="display:none">
+        <div class="logboek-title" data-i18n="logboek_title">📋 Pogingen</div>
+        <div id="logboek-rows"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="result-btn learn-btn" onclick="toonLeerMomenten()">
+          💡 <span data-i18n="learn_btn">Wat heb ik geleerd!</span>
+        </button>
+        <button class="result-btn" style="background:transparent;border:1px solid rgba(0,229,160,.25);color:rgba(0,229,160,.5);font-size:11px" onclick="herlaadOpdracht()" data-i18n="success_btn">↩ Opdracht opnieuw uitvoeren</button>
+      </div>
+    </div>
+
+    <!-- ── Leermomenten scherm ── -->
+    <div id="learn-view" style="display:none;text-align:left">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <span style="font-size:28px">🎓</span>
+        <div class="result-title" style="margin-bottom:0;font-size:20px" data-i18n="learn_title">Wat heb je geleerd?</div>
+      </div>
+
+      <div class="learn-block" id="learn-block-max">
+        <div class="learn-topic">
+          <span class="learn-icon">🔢</span>
+          <span data-i18n="learn_max_title">De MAX‑knop</span>
+        </div>
+        <div class="learn-question" data-i18n="learn_max_q">Waarom is het verstandig om de MAX‑knop te gebruiken?</div>
+        <div class="learn-answer" data-i18n="learn_max_a">De MAX‑knop berekent automatisch het hoogste bedrag dat je veilig kunt versturen, terwijl er precies genoeg native coin overblijft voor de transactiekosten. Zo voorkom je foutmeldingen en kun je je saldo probleemloos op 0 zetten.</div>
+      </div>
+
+      <div class="learn-block" id="learn-block-tokens">
+        <div class="learn-topic">
+          <span class="learn-icon">🔗</span>
+          <span data-i18n="learn_token_title">Tokens, native coins</span>
+        </div>
+        <div class="learn-question" data-i18n="learn_token_q">Waarom moet ik eerst mijn tokens versturen en daarna pas de native coin?</div>
+        <div class="learn-answer" data-i18n="learn_token_a">Een token is een digitaal tegoed dat op een blockchain draait, terwijl de native coin de munt is die die blockchain zelf gebruikt én nodig heeft om transactiekosten (gas) te betalen.<br><br>Tokens hebben gas fees nodig om verstuurd te worden. Deze kosten kunnen alleen worden betaald met de native coin (zoals ETH, TRX of BNB). Als je eerst de native coin verstuurt, blijft er geen gas meer over en kunnen je tokens niet meer worden verplaatst.</div>
+      </div>
+
+      <div class="learn-block" id="learn-block-expert">
+        <div class="learn-topic">
+          <span class="learn-icon">🏦</span>
+          <span data-i18n="learn_expert_title">Meerdere accounts &amp; Gas-Free</span>
+        </div>
+        <div class="learn-question" data-i18n="learn_expert_q1">Waarom kan een wallet meerdere accounts bevatten?</div>
+        <div class="learn-answer" data-i18n="learn_expert_a1">Eén seed phrase (mnemonic) kan meerdere accounts genereren. Elk account heeft een eigen adres en eigen saldo, maar ze zijn allemaal afgeleid van dezelfde 12 woorden. Bij een inbeslagneming is het daarom belangrijk om niet alleen het hoofdaccount te controleren, maar ook eventuele extra accounts — al het tegoed valt onder dezelfde mnemonic.</div>
+        <div class="learn-question" style="margin-top:14px" data-i18n="learn_expert_q2">Wat is een Gas-Free account?</div>
+        <div class="learn-answer" data-i18n="learn_expert_a2">Normaal gesproken heb je bij elke transactie op het Tron-netwerk een kleine hoeveelheid TRX nodig om de transactiekosten (gas) te betalen. Een Gas-Free account omzeilt dit: de transactiekosten worden niet in TRX afgerekend, maar als een vast bedrag in USDT ingehouden — in dit geval altijd <strong style="color:var(--cv-text)">1 USDT</strong> per transactie, verzonden naar de Tron GasFree Wallet Activator.<br><br>Dit klinkt eenvoudiger, maar het betekent ook dat je het volledige USDT-saldo nooit volledig kunt overmaken: er blijft altijd 1 USDT achter als transactiekost. Gebruik daarom ook hier de MAX-knop, die dit automatisch berekent.<br><br><span style="color:rgba(255,180,150,.9)">⚠️ Gas-Free accounts worden op dit moment slechts door enkele wallets ondersteund, waaronder TronLink en bepaalde versies van Trust Wallet. Niet elke wallet biedt deze optie aan.</span></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:20px">
+        <button class="result-btn" onclick="herlaadOpdracht()" data-i18n="success_btn">↩ Opdracht opnieuw uitvoeren</button>
+        <button class="result-btn" style="background:transparent;border:1px solid rgba(0,229,160,.25);color:rgba(0,229,160,.5);font-size:11px" onclick="toonSucces()" data-i18n="learn_back_btn">← Terug naar resultaat</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ MISLUKKING MODAL ═══ -->
+<div class="result-ov" id="failureModal">
+  <div class="result-card failure">
+    <span class="result-icon">❌</span>
+    <div class="result-title" data-i18n="failure_title">Opdracht Mislukt</div>
+    <div class="result-sub" data-i18n="failure_sub">De opdracht kon niet worden voltooid.<br>Zie onderstaande toelichting.</div>
+    <div class="result-detail" id="failure-detail"></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="result-btn" onclick="herstelFout()" data-i18n="failure_btn_retry">↩ Opnieuw proberen — wallet blijft hersteld</button>
+      <button class="result-btn" style="background:transparent;border:1px solid rgba(255,107,53,.3);color:rgba(255,107,53,.6);font-size:11px" onclick="herlaadOpdracht()" data-i18n="failure_btn_reset">↺ Volledig opnieuw beginnen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Send Modal -->
+<div class="modal-ov" id="sendModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" data-i18n="send_title">↑ Versturen naar OM-Wallet</div>
+      <button class="modal-close" onclick="closeSend()">×</button>
+    </div>
+
+    <div class="fg">
+      <label class="fl" data-i18n="send_coin_lbl">Coin selecteren</label>
+      <select class="fsel" id="s-coin" onchange="updateSendModal()"></select>
+    </div>
+
+    <!-- TRC-20 gas warning banner (hidden by default) -->
+    <div id="trc20-gas-banner" style="display:none;background:rgba(255,0,19,.06);border:1px solid rgba(255,0,19,.2);border-radius:7px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:rgba(255,180,160,.9);gap:8px;line-height:1.5;align-items:flex-start"></div>
+
+    <div class="fg">
+      <label class="fl"><span data-i18n="send_addr_lbl">Ontvangstadres</span> <span style="color:var(--cv-muted);font-weight:400" data-i18n="send_addr_hint">— zoek het juiste adres op in de OM-Wallet rechts</span></label>
+      <input class="fi" id="s-to-addr" placeholder="Voer het bestemmingsadres in…" oninput="validateDestAddr()" autocomplete="off" spellcheck="false" />
+      <div id="addr-feedback" style="font-size:10px;margin-top:5px;min-height:14px"></div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" data-i18n="send_amount_lbl">Bedrag</label>
+      <div class="amount-wrap">
+        <input class="fi" id="s-amount" type="number" placeholder="0.00" oninput="updateFee()" />
+        <button class="max-btn" id="max-btn" onclick="fillMax()" title="Verstuur alles minus fee">MAX</button>
+      </div>
+    </div>
+
+    <div style="font-size:10px;color:var(--cv-muted);margin-bottom:10px">
+      <span data-i18n="send_available">Beschikbaar:</span> <span id="s-avail" style="color:var(--cv-text)">—</span>
+      · <span data-i18n="send_after_fee">Na fee:</span> <span id="s-avail-net" style="color:var(--cv-accent)">—</span>
+    </div>
+
+    <div class="fee-row">
+      <span data-i18n="send_fee_lbl">Netwerk fee</span>
+      <span id="s-fee" style="color:var(--cv-text)">—</span>
+    </div>
+    <div class="fee-row" style="border-top:none">
+      <span data-i18n="send_total_lbl">Totaal</span>
+      <span id="s-total" style="color:var(--cv-accent)">—</span>
+    </div>
+
+    <button class="btn btn-p" style="margin-top:16px" onclick="executeSend()" data-i18n="send_btn">🔏 Signeren & Versturen</button>
+  </div>
+</div>
+
+<!-- ═══ OPDRACHT POPUP ═══ -->
+<div id="opdracht-popup">
+  <div class="opdracht-popup-card">
+    <button class="opdracht-popup-close" onclick="closeOpdrachtPopup()">×</button>
+    <div class="opdracht-badge">Oefening Inbeslagneming Cryptovaluta</div>
+    <div class="opdracht-title">Opdracht</div>
+    <div class="opdracht-body">
+      <p>Door het team is een woordenlijst van 12 woorden aangetroffen, een zogenaamde <strong style="color:#dce8f5">mnemonic</strong>. Te weten:</p>
+      <div class="opdracht-mnemonic">
+        <div class="mw"><span class="mn">1</span><span class="mv">abandon</span></div>
+        <div class="mw"><span class="mn">2</span><span class="mv">ability</span></div>
+        <div class="mw"><span class="mn">3</span><span class="mv">able</span></div>
+        <div class="mw"><span class="mn">4</span><span class="mv">about</span></div>
+        <div class="mw"><span class="mn">5</span><span class="mv">above</span></div>
+        <div class="mw"><span class="mn">6</span><span class="mv">absent</span></div>
+        <div class="mw"><span class="mn">7</span><span class="mv">absorb</span></div>
+        <div class="mw"><span class="mn">8</span><span class="mv">abstract</span></div>
+        <div class="mw"><span class="mn">9</span><span class="mv">absurd</span></div>
+        <div class="mw"><span class="mn">10</span><span class="mv">abuse</span></div>
+        <div class="mw"><span class="mn">11</span><span class="mv">access</span></div>
+        <div class="mw"><span class="mn">12</span><span class="mv">accident</span></div>
+      </div>
+      <p>Noteer deze mnemonic en ga er zorgvuldig mee om.</p>
+      <hr class="opdracht-divider">
+      <p>De wallet die in gebruik was betrof een <strong style="color:#dce8f5">CryptoVault-wallet</strong>. Echter deze wallet is niet aangetroffen. Het is aan jou om alle tegoeden in deze wallet over te maken naar de <strong style="color:#dce8f5">OM-wallet</strong>.</p>
+      <p>Je kunt daar een eigen wallet voor gebruiken. Als je begint met de opdracht zie je jouw CryptoVault-wallet naast de OM-wallet staan.</p>
+      <p>Voer deze opdracht zodanig uit dat er <strong style="color:var(--cv-accent)">GEEN saldo in de CryptoVault wallet achterblijft</strong>. Binnen de OM-wallet is al een case aangemaakt met benodigde adressen waar de cryptocurrency naar toe kan worden gestuurd.</p>
+    </div>
+    <div class="opdracht-warn">
+      <span>⚠️</span>
+      <span>Dit is een gesimuleerde oefenomgeving. Er worden geen echte transacties uitgevoerd en er gaat geen echt geld om.</span>
+    </div>
+    <button class="opdracht-start" onclick="closeOpdrachtPopup()" data-i18n="opdracht_close_btn">Sluiten ×</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  SHARED DATA
+// ══════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════
+//  TAAL / LANGUAGE SYSTEM (moet eerst geladen worden)
+// ══════════════════════════════════════════════════════════
+let currentLang = 'nl';
+
+const TRANSLATIONS = {
+  nl: {
+    // Topbar
+    edu_badge:          'EDUCATIEF',
+    net_badge:          '● DEMO NETWERK — GEEN ECHTE FONDSEN',
+    opdracht_btn:       'Opdracht bekijken',
+    // Phone labels
+    om_wallet_label:    'OM-Wallet',
+    // CV Welcome
+    cv_welcome_lbl:     'Welkom',
+    cv_welcome_desc:    'Herstel of genereer een wallet. Verstuur daarna crypto naar de <strong style="color:var(--cv-accent)">OM-Wallet</strong> rechts.',
+    cv_edu_warn:        'Uitsluitend voor educatieve doeleinden. Gebruik nooit echte seed phrases.',
+    cv_btn_generate:    '✨ Genereer Nieuwe Wallet',
+    cv_btn_restore:     '🔑 Herstel met Mnemonic',
+    cv_mnemonic_lbl:    'Wat is een Mnemonic?',
+    cv_mnemonic_desc:   'Een <strong style="color:var(--cv-text)">seed phrase</strong> (BIP-39) bestaat uit 12–24 woorden waarmee je wallet volledig hersteld kan worden. Via PBKDF2 → HD-key (BIP-44) wordt een uniek adres afgeleid.',
+    // CV Recover
+    cv_recover_lbl:     'Voer 12 Mnemonic woorden in',
+    cv_recover_hint:    'Voer de 12 woorden van je seed phrase in, één woord per veld.',
+    cv_btn_do_restore:  'Wallet Herstellen',
+    cv_btn_back:        '← Terug',
+    // CV New wallet
+    cv_newwallet_lbl:   '⚠ Bewaar deze recovery phrase',
+    cv_newwallet_warn:  'Schrijf deze 12 woorden op in de juiste volgorde. Verlies je ze, verlies je permanent toegang tot je wallet.',
+    cv_btn_confirm_wallet: 'Ik heb de woorden genoteerd — Open Wallet',
+    cv_btn_cancel:      '← Annuleren',
+    // CV Dashboard
+    cv_portfolio_lbl:   'Portfolio',
+    cv_btn_copy:        'Kopieer',
+    cv_btn_logout:      'Uit',
+    cv_act_send:        '↑ Versturen',
+    cv_act_receive:     '↓ Ontvangen',
+    tab_assets:         'Assets',
+    tab_txs:            'Transacties',
+    tab_info:           'Info',
+    cv_keys_lbl:        'Afgeleide Sleutels',
+    cv_bip_lbl:         'BIP-39 / BIP-44 Uitleg',
+    cv_bip_desc:        'Mnemonic → PBKDF2 (512-bit seed) → HMAC-SHA512 master key → elliptische curve (secp256k1) → Keccak-256 hash → adres.',
+    // OM Wallet
+    om_sub_title:       'Ontvangst Wallet',
+    om_portfolio_lbl:   'Portfolio Waarde',
+    om_addresses_lbl:   'Ontvangstadressen (klik om te kopiëren)',
+    om_addresses_hint:  'Gebruik deze adressen in de CryptoVault (links) om crypto te ontvangen op de OM-Wallet.',
+    om_copy_btn:        '📋 Kopieer',
+    om_tx_badge:        'NIEUW',
+    om_no_txs:          'Nog geen transacties ontvangen',
+    om_waiting:         'Wacht op inkomende transacties…',
+    // Send modal
+    send_title:         '↑ Versturen naar OM-Wallet',
+    send_coin_lbl:      'Coin selecteren',
+    send_addr_lbl:      'Ontvangstadres',
+    send_addr_hint:     '— zoek het juiste adres op in de OM-Wallet rechts',
+    send_amount_lbl:    'Bedrag',
+    send_available:     'Beschikbaar:',
+    send_after_fee:     'Na fee:',
+    send_fee_lbl:       'Netwerk fee',
+    send_total_lbl:     'Totaal',
+    send_btn:           '🔏 Signeren & Versturen',
+    send_placeholder:   'Voer het bestemmingsadres in…',
+    send_max_title:     'Verstuur alles minus fee',
+    // Modals
+    wrong_title:        'Onjuiste Keuze',
+    wrong_sub:          'Je hebt een nieuwe, lege wallet aangemaakt.<br>Dit was niet de bedoeling.',
+    wrong_btn:          '↩ Terug — herstel met de juiste mnemonic',
+    wrong_detail: '<strong style="color:var(--cv-warn)">Wat ging er mis?</strong><br><br>De opdracht vereist dat je de bestaande wallet <strong>herstelt</strong> met de mnemonic die je hebt ontvangen. Door een nieuwe wallet te genereren, open je een volledig nieuw en leeg adres — de tegoeden uit de oorspronkelijke wallet zijn hier niet aanwezig.<br><br><strong>Juiste aanpak:</strong> kies <em>\"Herstel met Mnemonic\"</em> en voer de 12 woorden in die je bij de opdracht hebt gekregen.',
+    success_title:      'Opdracht Geslaagd!',
+    success_sub:        'Alle tegoeden zijn succesvol overgemaakt<br>naar de OM-Wallet. De CryptoVault is leeg.',
+    success_btn:        '↩ Opdracht opnieuw uitvoeren',
+    learn_btn:          'Wat heb ik geleerd!',
+    learn_title:        'Wat heb je geleerd?',
+    learn_max_title:    'De MAX‑knop',
+    learn_max_q:        'Waarom is het verstandig om de MAX‑knop te gebruiken?',
+    learn_max_a:        'De MAX‑knop berekent automatisch het hoogste bedrag dat je veilig kunt versturen, terwijl er precies genoeg native coin overblijft voor de transactiekosten. Zo voorkom je foutmeldingen en kun je je saldo probleemloos op 0 zetten.',
+    learn_token_title:  'Tokens, native coins',
+    learn_token_q:      'Waarom moet ik eerst mijn tokens versturen en daarna pas de native coin?',
+    learn_token_a:      'Een token is een digitaal tegoed dat op een blockchain draait, terwijl de native coin de munt is die die blockchain zelf gebruikt én nodig heeft om transactiekosten (gas) te betalen.<br><br>Tokens hebben gas fees nodig om verstuurd te worden. Deze kosten kunnen alleen worden betaald met de native coin (zoals ETH, TRX of BNB). Als je eerst de native coin verstuurt, blijft er geen gas meer over en kunnen je tokens niet meer worden verplaatst.',
+    learn_back_btn:     '← Terug naar resultaat',
+    failure_title:      'Opdracht Mislukt',
+    failure_sub:        'De opdracht kon niet worden voltooid.<br>Zie onderstaande toelichting.',
+    failure_btn_retry:  '↩ Opnieuw proberen — wallet blijft hersteld',
+    failure_btn_reset:  '↺ Volledig opnieuw beginnen',
+    // Opdracht overlay/popup
+    opdracht_start_btn: 'Begin met de opdracht →',
+    opdracht_close_btn: 'Sluiten ×',
+    // Dynamic strings (used in JS)
+    dyn_today:          'vandaag',
+    dyn_no_txs_cv:      'Geen transacties',
+    dyn_no_txs_om:      'Nog geen transacties ontvangen',
+    dyn_om_sub_wait:    'Wacht op inkomende transacties…',
+    dyn_om_sub_recv:    'transactie(s) ontvangen',
+    dyn_send_pending:   'In behandeling van CryptoVault…',
+    dyn_recv_from:      'Ontvangen van CryptoVault',
+    dyn_recv_friend:    'Ontvangen van vriend',
+    dyn_paid_nft:       'Betaald voor NFT',
+    dyn_staking:        'Staking reward',
+    dyn_trx_gas:        'TRON netwerk · gas token',
+    dyn_insuf_trx:      'onvoldoende TRX',
+    dyn_insuf_fee:      'Onvoldoende voor fee',
+    dyn_empty:          'Leeg',
+    dyn_no_gas:         'geen TRX voor gas',
+    dyn_word:           'woord',
+    dyn_valid_word:     '✓ Geldig woord',
+    dyn_unknown_word:   'Onbekend woord. Bedoelde u:',
+    dyn_unknown_word2:  'Onbekend woord — niet in BIP-39 woordenlijst',
+    dyn_errors_found:   'fout(en) gevonden:',
+    dyn_word_empty:     'leeg — vul dit veld in',
+    dyn_word_invalid:   'is ongeldig',
+    dyn_did_you_mean:   'bedoelde u',
+    dyn_or:             'of',
+    dyn_not_bip39:      'staat niet in de BIP-39 woordenlijst',
+    dyn_invalid_phrase: 'Ongeldige seed phrase',
+    dyn_invalid_combo:  'Alle woorden zijn geldig BIP-39 woorden, maar deze combinatie komt niet overeen met de bekende wallet seed phrase. Controleer de volgorde en spelling.',
+    dyn_addr_ok:        '✓ OM-Wallet adres herkend',
+    dyn_addr_wrong_coin:'Dit is het OM-adres voor',
+    dyn_select_coin:    'selecteer',
+    dyn_as_coin:        'als coin boven',
+    dyn_addr_unknown:   '✗ Onbekend adres — controleer het OM-Wallet ontvangstadres',
+    dyn_fee_in_trx:     '— betaald in TRX',
+    dyn_gas_ok:         'Fee betaald in',
+    dyn_trx_bal:        'TRX saldo:',
+    dyn_no_trx:         'Onvoldoende TRX voor gas. Je hebt',
+    dyn_trx_needed:     'TRX is nodig.',
+    dyn_send_trx_first: 'Verstuur eerst TRX',
+    dyn_to_have_gas:    'om gas te hebben.',
+    dyn_success_case:   'Overgeboekt naar OM-Wallet — Case F162534:',
+    dyn_total_value:    'Totale waarde:',
+    dyn_toast_copied:   '✓ Adres gekopieerd',
+    dyn_toast_copy_coin:'adres gekopieerd — plak het in het verstuurformulier',
+    dyn_toast_copy_fail:'⚠ Kopiëren mislukt — selecteer het adres handmatig',
+    dyn_toast_qr:       '📲 Toon QR — kopieer adres bovenaan',
+    dyn_toast_login:    '⚠️ Eerst inloggen',
+    dyn_toast_enter_addr:'⚠️ Voer een ontvangstadres in',
+    dyn_toast_invalid_addr:'⚠️ Ongeldig bestemmingsadres',
+    dyn_toast_enter_amt:'⚠️ Voer een geldig bedrag in',
+    dyn_toast_no_gas:   'voor gas',
+    dyn_toast_no_bal:   'saldo',
+    dyn_toast_no_bal2:  '⚠️ Onvoldoende saldo (incl. fee)',
+    dyn_toast_max:      '⚠️ Saldo te laag om fee te dekken',
+    dyn_toast_sent:     'verstuurd — wacht op bevestiging…',
+    dyn_toast_recv:     '✅ OM-Wallet ontving',
+    dyn_toast_reset:    '↩ CryptoVault hersteld — eerder overgeboekte bedragen blijven bewaard',
+    dyn_tron_same:      'zelfde Tron adres',
+    dyn_send_to_om:     '→ OM-Wallet',
+    dyn_cause_trx:      'Oorzaak: TRX vóór USDT verstuurd',
+    dyn_trx_moved:      'Je hebt de',
+    dyn_trx_moved2:     'al overgemaakt naar de OM-Wallet.',
+    dyn_no_gas_usdt:    'Hierdoor is er onvoldoende TRX beschikbaar om de transactiekosten (gas) te betalen voor het versturen van de USDT.',
+    dyn_still_in_cv:    'Nog in CryptoVault:',
+    dyn_cant_send:      'kan niet meer worden verstuurd.',
+    dyn_correct_order:  'Juiste volgorde: verstuur altijd eerst de USDT, zodat de TRX beschikbaar blijft als gas.',
+    dyn_cause_stuck:    'Oorzaak: te weinig saldo voor transactiekosten',
+    dyn_stuck_desc:     'Je hebt een bedrag verstuurd waarbij er een klein restant is achtergebleven. Dit restant is te klein om de netwerk-fee te betalen, waardoor het definitief vastzit en niet meer kan worden overgeboekt — tenzij er weer saldo aan toegevoegd wordt, maar dat is niet wenselijk.',
+    dyn_remaining:      'Resterend saldo:',
+    dyn_min_fee:        'Minimale transactiefee:',
+    dyn_shortfall:      'Tekort:',
+    dyn_tip_max:        'Tip: gebruik altijd de',
+    dyn_max_btn:        'MAX knop',
+    dyn_tip_max2:       'naast het bedragveld. Die berekent automatisch het maximale bedrag dat verstuurd kan worden ná aftrek van de transactiefee, zodat er precies niets achterblijft.',
+    dyn_insuf_usdt:     'onvoldoende',
+    dyn_tron_net:       'Tron adres',
+    dyn_pad_label:      'Pad:',
+    dyn_addr_label:     'Adres:',
+  },
+  en: {
+    edu_badge:          'EDUCATIONAL',
+    net_badge:          '● DEMO NETWORK — NO REAL FUNDS',
+    opdracht_btn:       'View Assignment',
+    om_wallet_label:    'OM-Wallet',
+    cv_welcome_lbl:     'Welcome',
+    cv_welcome_desc:    'Restore or generate a wallet. Then send crypto to the <strong style="color:var(--cv-accent)">OM-Wallet</strong> on the right.',
+    cv_edu_warn:        'For educational purposes only. Never use real seed phrases.',
+    cv_btn_generate:    '✨ Generate New Wallet',
+    cv_btn_restore:     '🔑 Restore with Mnemonic',
+    cv_mnemonic_lbl:    'What is a Mnemonic?',
+    cv_mnemonic_desc:   'A <strong style="color:var(--cv-text)">seed phrase</strong> (BIP-39) consists of 12–24 words that can fully restore your wallet. Via PBKDF2 → HD-key (BIP-44) a unique address is derived.',
+    cv_recover_lbl:     'Enter 12 Mnemonic words',
+    cv_recover_hint:    'Enter the 12 words of your seed phrase, one word per field.',
+    cv_btn_do_restore:  'Restore Wallet',
+    cv_btn_back:        '← Back',
+    cv_newwallet_lbl:   '⚠ Save this recovery phrase',
+    cv_newwallet_warn:  'Write down these 12 words in the correct order. If you lose them, you permanently lose access to your wallet.',
+    cv_btn_confirm_wallet: 'I have noted the words — Open Wallet',
+    cv_btn_cancel:      '← Cancel',
+    cv_portfolio_lbl:   'Portfolio',
+    cv_btn_copy:        'Copy',
+    cv_btn_logout:      'Sign out',
+    cv_act_send:        '↑ Send',
+    cv_act_receive:     '↓ Receive',
+    tab_assets:         'Assets',
+    tab_txs:            'Transactions',
+    tab_info:           'Info',
+    cv_keys_lbl:        'Derived Keys',
+    cv_bip_lbl:         'BIP-39 / BIP-44 Explanation',
+    cv_bip_desc:        'Mnemonic → PBKDF2 (512-bit seed) → HMAC-SHA512 master key → elliptic curve (secp256k1) → Keccak-256 hash → address.',
+    om_sub_title:       'Receiving Wallet',
+    om_portfolio_lbl:   'Portfolio Value',
+    om_addresses_lbl:   'Receiving Addresses (click to copy)',
+    om_addresses_hint:  'Use these addresses in CryptoVault (left) to receive crypto in the OM-Wallet.',
+    om_copy_btn:        '📋 Copy',
+    om_tx_badge:        'NEW',
+    om_no_txs:          'No transactions received yet',
+    om_waiting:         'Waiting for incoming transactions…',
+    send_title:         '↑ Send to OM-Wallet',
+    send_coin_lbl:      'Select coin',
+    send_addr_lbl:      'Recipient address',
+    send_addr_hint:     '— find the correct address in the OM-Wallet on the right',
+    send_amount_lbl:    'Amount',
+    send_available:     'Available:',
+    send_after_fee:     'After fee:',
+    send_fee_lbl:       'Network fee',
+    send_total_lbl:     'Total',
+    send_btn:           '🔏 Sign & Send',
+    send_placeholder:   'Enter the destination address…',
+    send_max_title:     'Send all minus fee',
+    wrong_title:        'Wrong Choice',
+    wrong_sub:          'You created a new, empty wallet.<br>This was not the intended action.',
+    wrong_btn:          '↩ Back — restore with the correct mnemonic',
+    wrong_detail: '<strong style="color:var(--cv-warn)">What went wrong?</strong><br><br>The assignment requires you to <strong>restore</strong> the existing wallet using the mnemonic you received. By generating a new wallet, you open a completely new empty address — the funds from the original wallet are not present here.<br><br><strong>Correct approach:</strong> choose <em>\"Restore with Mnemonic\"</em> and enter the 12 words provided with the assignment.',
+    success_title:      'Assignment Complete!',
+    success_sub:        'All funds have been successfully transferred<br>to the OM-Wallet. The CryptoVault is empty.',
+    success_btn:        '↩ Redo the assignment',
+    learn_btn:          'What did I learn!',
+    learn_title:        'What did you learn?',
+    learn_max_title:    'The MAX button',
+    learn_max_q:        'Why is it smart to use the MAX button?',
+    learn_max_a:        'The MAX button automatically calculates the highest amount you can safely send, while leaving exactly enough native coin for the transaction fees. This prevents error messages and lets you bring your balance to 0 without issues.',
+    learn_token_title:  'Tokens, native coins',
+    learn_token_q:      'Why should I send my tokens first and only then the native coin?',
+    learn_token_a:      'A token is a digital asset running on a blockchain, while the native coin is the currency that the blockchain itself uses — and needs — to pay transaction fees (gas).<br><br>Tokens require gas fees to be sent. These fees can only be paid with the native coin (such as ETH, TRX or BNB). If you send the native coin first, no gas remains and your tokens can no longer be moved.',
+    learn_back_btn:     '← Back to result',
+    failure_title:      'Assignment Failed',
+    failure_sub:        'The assignment could not be completed.<br>See the explanation below.',
+    failure_btn_retry:  '↩ Try again — wallet stays restored',
+    failure_btn_reset:  '↺ Start completely over',
+    opdracht_start_btn: 'Start the assignment →',
+    opdracht_close_btn: 'Close ×',
+    dyn_today:          'today',
+    dyn_no_txs_cv:      'No transactions',
+    dyn_no_txs_om:      'No transactions received yet',
+    dyn_om_sub_wait:    'Waiting for incoming transactions…',
+    dyn_om_sub_recv:    'transaction(s) received',
+    dyn_send_pending:   'Processing from CryptoVault…',
+    dyn_recv_from:      'Received from CryptoVault',
+    dyn_recv_friend:    'Received from friend',
+    dyn_paid_nft:       'Paid for NFT',
+    dyn_staking:        'Staking reward',
+    dyn_trx_gas:        'TRON network · gas token',
+    dyn_insuf_trx:      'insufficient TRX',
+    dyn_insuf_fee:      'Insufficient for fee',
+    dyn_empty:          'Empty',
+    dyn_no_gas:         'no TRX for gas',
+    dyn_word:           'word',
+    dyn_valid_word:     '✓ Valid word',
+    dyn_unknown_word:   'Unknown word. Did you mean:',
+    dyn_unknown_word2:  'Unknown word — not in the BIP-39 word list',
+    dyn_errors_found:   'error(s) found:',
+    dyn_word_empty:     'empty — please fill in this field',
+    dyn_word_invalid:   'is invalid',
+    dyn_did_you_mean:   'did you mean',
+    dyn_or:             'or',
+    dyn_not_bip39:      'not in the BIP-39 word list',
+    dyn_invalid_phrase: 'Invalid seed phrase',
+    dyn_invalid_combo:  'All words are valid BIP-39 words, but this combination does not match the known wallet seed phrase. Check the order and spelling.',
+    dyn_addr_ok:        '✓ OM-Wallet address recognized',
+    dyn_addr_wrong_coin:'This is the OM address for',
+    dyn_select_coin:    'select',
+    dyn_as_coin:        'as the coin above',
+    dyn_addr_unknown:   '✗ Unknown address — check the OM-Wallet receiving address',
+    dyn_fee_in_trx:     '— paid in TRX',
+    dyn_gas_ok:         'Fee paid in',
+    dyn_trx_bal:        'TRX balance:',
+    dyn_no_trx:         'Insufficient TRX for gas. You have',
+    dyn_trx_needed:     'TRX is required.',
+    dyn_send_trx_first: 'Send TRX first',
+    dyn_to_have_gas:    'to have gas.',
+    dyn_success_case:   'Transferred to OM-Wallet — Case F162534:',
+    dyn_total_value:    'Total value:',
+    dyn_toast_copied:   '✓ Address copied',
+    dyn_toast_copy_coin:'address copied — paste it in the send form',
+    dyn_toast_copy_fail:'⚠ Copy failed — select the address manually',
+    dyn_toast_qr:       '📲 Show QR — copy address above',
+    dyn_toast_login:    '⚠️ Please log in first',
+    dyn_toast_enter_addr:'⚠️ Please enter a recipient address',
+    dyn_toast_invalid_addr:'⚠️ Invalid destination address',
+    dyn_toast_enter_amt:'⚠️ Please enter a valid amount',
+    dyn_toast_no_gas:   'for gas',
+    dyn_toast_no_bal:   'balance',
+    dyn_toast_no_bal2:  '⚠️ Insufficient balance (incl. fee)',
+    dyn_toast_max:      '⚠️ Balance too low to cover the fee',
+    dyn_toast_sent:     'sent — waiting for confirmation…',
+    dyn_toast_recv:     '✅ OM-Wallet received',
+    dyn_toast_reset:    '↩ CryptoVault restored — previously transferred amounts are preserved',
+    dyn_tron_same:      'same Tron address',
+    dyn_send_to_om:     '→ OM-Wallet',
+    dyn_cause_trx:      'Cause: TRX sent before USDT',
+    dyn_trx_moved:      'You have already transferred',
+    dyn_trx_moved2:     'to the OM-Wallet.',
+    dyn_no_gas_usdt:    'As a result, there is insufficient TRX available to pay the transaction fee (gas) for sending the USDT.',
+    dyn_still_in_cv:    'Still in CryptoVault:',
+    dyn_cant_send:      'can no longer be sent.',
+    dyn_correct_order:  'Correct order: always send USDT first, so TRX remains available as gas.',
+    dyn_cause_stuck:    'Cause: insufficient balance for transaction fees',
+    dyn_stuck_desc:     'You sent an amount that left a small remainder. This remainder is too small to pay the network fee, making it permanently stuck and unable to be transferred — unless more funds are added, which is not desirable.',
+    dyn_remaining:      'Remaining balance:',
+    dyn_min_fee:        'Minimum transaction fee:',
+    dyn_shortfall:      'Shortfall:',
+    dyn_tip_max:        'Tip: always use the',
+    dyn_max_btn:        'MAX button',
+    dyn_tip_max2:       'next to the amount field. It automatically calculates the maximum amount that can be sent after deducting the transaction fee, so nothing is left behind.',
+    dyn_insuf_usdt:     'insufficient',
+    dyn_tron_net:       'Tron address',
+    dyn_pad_label:      'Path:',
+    dyn_addr_label:     'Address:',
+  }
+};
+
+function t(key) {
+  return TRANSLATIONS[currentLang][key] || TRANSLATIONS['nl'][key] || key;
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+
+  // Update switcher buttons
+  // Sync alle taalschakelaars (topbar + overlay)
+  document.querySelectorAll('[id^="btn-nl"]').forEach(el => el.classList.toggle('active', lang === 'nl'));
+  document.querySelectorAll('[id^="btn-en"]').forEach(el => el.classList.toggle('active', lang === 'en'));
+
+  // Update all static data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.innerHTML = t(key);
+  });
+
+  // Update dynamic placeholder & title attributes
+  const addrInput = document.getElementById('s-to-addr');
+  if (addrInput) addrInput.placeholder = t('send_placeholder');
+  const maxBtn = document.getElementById('max-btn');
+  if (maxBtn) maxBtn.title = t('send_max_title');
+
+  // Update OM copy buttons (dynamically rendered)
+  document.querySelectorAll('.om-copy-btn').forEach(btn => {
+    btn.textContent = t('om_copy_btn');
+  });
+
+  // Update mnemonic input placeholders
+  for (let i = 1; i <= 12; i++) {
+    const el = document.getElementById('cw' + i);
+    if (el) el.placeholder = t('dyn_word');
+  }
+
+  // Update TX badge
+  const badge = document.getElementById('om-tx-badge');
+  if (badge) badge.textContent = t('om_tx_badge');
+
+  // Update OM sub-text if wallet is empty
+  const omSub = document.getElementById('om-sub');
+  if (omSub && omSub.textContent.trim() === TRANSLATIONS['nl']['om_waiting'] ||
+      omSub && omSub.textContent.trim() === TRANSLATIONS['en']['om_waiting']) {
+    omSub.textContent = t('dyn_om_sub_wait');
+  }
+
+  // Update info tab labels
+  const padEl = document.querySelector('[data-i18n="cv_bip_desc"]');
+  // Re-render dynamic content if state exists
+  if (cvState) {
+    cvRenderPortfolio();
+    cvRenderCoins();
+    cvRenderTxs();
+    populateSendSelect();
+  }
+  omRenderPortfolio();
+  omRenderCoins();
+  omRenderTxs();
+  omRenderAddresses();
+
+  // Update opdracht overlay & popup content
+  updateOpdrachtText();
+
+  // Herrender gas-free UI bij taalwissel
+  if (gasFreeState.active) {
+    // Ververs switcher labels
+    const mainBtn = document.querySelector('#account-switcher .acc-btn:first-child .acc-badge');
+    if (mainBtn) mainBtn.textContent = t('gf_main_lbl');
+    // Herrender dashboard als gas-free tab actief is
+    if (activeAccount === 'gasfree') renderGasFreeDashboard();
+  }
+}
+
+function updateOpdrachtText() {
+  const nl = currentLang === 'nl';
+  // Overlay texts
+  const overlayBadge = document.querySelector('#opdracht-overlay .opdracht-badge');
+  const overlayTitle = document.querySelector('#opdracht-overlay .opdracht-title');
+  if (overlayBadge) overlayBadge.innerHTML = '●&nbsp;&nbsp;' + (nl ? 'Oefening Inbeslagneming Cryptovaluta' : 'Exercise Cryptocurrency Seizure');
+  if (overlayTitle) overlayTitle.textContent = nl ? 'Opdracht' : 'Assignment';
+
+  // Overlay body paragraphs
+  const overlayBody = document.querySelector('#opdracht-overlay .opdracht-body');
+  if (overlayBody) overlayBody.innerHTML = nl ? `
+    <p>Door het team is een woordenlijst van 12 woorden aangetroffen, een zogenaamde <strong style="color:#dce8f5">mnemonic</strong>. Te weten:</p>
+    <div class="opdracht-mnemonic">
+      ${[['abandon','ability','able'],['about','above','absent'],['absorb','abstract','absurd'],['abuse','access','accident']].flat().map((w,i)=>`<div class="mw"><span class="mn">${i+1}</span><span class="mv">${w}</span></div>`).join('')}
+    </div>
+    <p>Noteer deze mnemonic en ga er zorgvuldig mee om.</p>
+    <hr class="opdracht-divider">
+    <p>De wallet die in gebruik was betrof een <strong style="color:#dce8f5">CryptoVault-wallet</strong>. Echter deze wallet is niet aangetroffen. Het is aan jou om alle tegoeden in deze wallet over te maken naar de <strong style="color:#dce8f5">OM-wallet</strong>.</p>
+    <p>Je kunt daar een eigen wallet voor gebruiken. Als je begint met de opdracht zie je jouw CryptoVault-wallet naast de OM-wallet staan.</p>
+    <p>Voer deze opdracht zodanig uit dat er <strong style="color:var(--cv-accent)">GEEN saldo in de CryptoVault wallet achterblijft</strong>. Binnen de OM-wallet is al een case aangemaakt met benodigde adressen waar de cryptocurrency naar toe kan worden gestuurd.</p>
+  ` : `
+    <p>The team has found a list of 12 words, a so-called <strong style="color:#dce8f5">mnemonic</strong>. Specifically:</p>
+    <div class="opdracht-mnemonic">
+      ${[['abandon','ability','able'],['about','above','absent'],['absorb','abstract','absurd'],['abuse','access','accident']].flat().map((w,i)=>`<div class="mw"><span class="mn">${i+1}</span><span class="mv">${w}</span></div>`).join('')}
+    </div>
+    <p>Record this mnemonic and handle it with care.</p>
+    <hr class="opdracht-divider">
+    <p>The wallet in use was a <strong style="color:#dce8f5">CryptoVault wallet</strong>. However, this wallet has not been found. It is your task to transfer all funds from this wallet to the <strong style="color:#dce8f5">OM wallet</strong>.</p>
+    <p>You may use a personal wallet for this. Once you start the assignment, you will see your CryptoVault wallet alongside the OM wallet.</p>
+    <p>Complete this assignment such that <strong style="color:var(--cv-accent)">NO balance remains in the CryptoVault wallet</strong>. A case has already been created in the OM wallet with the required addresses to which the cryptocurrency can be sent.</p>
+  `;
+
+  const overlayWarn = document.querySelector('#opdracht-overlay .opdracht-warn span:last-child');
+  if (overlayWarn) overlayWarn.textContent = nl
+    ? 'Dit is een gesimuleerde oefenomgeving. Er worden geen echte transacties uitgevoerd en er gaat geen echt geld om.'
+    : 'This is a simulated training environment. No real transactions are executed and no real money is involved.';
+
+  // Popup texts (same content)
+  const popupBadge = document.querySelector('#opdracht-popup .opdracht-badge');
+  const popupTitle = document.querySelector('#opdracht-popup .opdracht-title');
+  if (popupBadge) popupBadge.innerHTML = '●&nbsp;&nbsp;' + (nl ? 'Oefening Inbeslagneming Cryptovaluta' : 'Exercise Cryptocurrency Seizure');
+  if (popupTitle) popupTitle.textContent = nl ? 'Opdracht' : 'Assignment';
+
+  const popupBody = document.querySelector('#opdracht-popup .opdracht-body');
+  if (popupBody) popupBody.innerHTML = overlayBody ? overlayBody.innerHTML : '';
+
+  const popupWarn = document.querySelector('#opdracht-popup .opdracht-warn span:last-child');
+  if (popupWarn) popupWarn.textContent = nl
+    ? 'Dit is een gesimuleerde oefenomgeving. Er worden geen echte transacties uitgevoerd en er gaat geen echt geld om.'
+    : 'This is a simulated training environment. No real transactions are executed and no real money is involved.';
+
+  // Info tab key labels
+  document.querySelectorAll('[data-i18n="cv_bip_desc"]').forEach(el => el.innerHTML = t('cv_bip_desc'));
+}
+
+
+const WORD_LIST = ["abandon","ability","able","about","above","absent","absorb","abstract","absurd","abuse","access","accident","account","accuse","achieve","acid","acoustic","acquire","across","action","actor","actress","actual","adapt","add","addict","address","adjust","admit","adult","advance","advice","aerobic","afford","afraid","again","age","agent","agree","ahead","aim","air","airport","aisle","alarm","album","alcohol","alert","alien","all","alley","allow","almost","alone","alpha","already","also","alter","always","amateur","amazing","among","amount","amused","analyst","anchor","ancient","anger","angle","angry","animal","ankle","announce","annual","another","answer","antenna","antique","anxiety","any","apart","apology","appear","apple","approve","april","arch","arctic","area","arena","argue","arm","armed","armor","army","around","arrange","arrest","arrive","arrow","art","artefact","artist","artwork","ask","aspect","assault","asset","assist","assume","asthma","athlete","atom","attack","attend","attitude","attract","auction","audit","august","aunt","author","auto","autumn","average","avocado","avoid","awake","aware","away","awesome","awful","awkward","axis"];
+
+const COINS = [
+  {id:'btc', name:'Bitcoin',       ticker:'BTC',  icon:'₿', color:'#f7931a',bg:'rgba(247,147,26,.12)', balance:0.0482,  price:68420, change:+2.3},
+  {id:'eth', name:'Ethereum',      ticker:'ETH',  icon:'Ξ', color:'#627eea',bg:'rgba(98,126,234,.12)', balance:1.234,   price:3840,  change:+1.8},
+  {id:'sol', name:'Solana',        ticker:'SOL',  icon:'◎', color:'#9945ff',bg:'rgba(153,69,255,.12)', balance:18.5,    price:185,   change:-0.9},
+  {id:'bnb', name:'BNB',           ticker:'BNB',  icon:'B', color:'#f3ba2f',bg:'rgba(243,186,47,.12)', balance:2.1,     price:640,   change:+0.4},
+  {id:'trx', name:'TRON',          ticker:'TRX',  icon:'T', color:'#ff0013',bg:'rgba(255,0,19,.10)',   balance:850,     price:0.118, change:+3.1},
+  {id:'usdt_trc20', name:'USDT (Tron)', ticker:'USDT', icon:'$', color:'#26a17b',bg:'rgba(38,161,123,.12)', balance:245.00, price:1.00,  change:0.0,
+    isTrc20:true, gasToken:'trx'},
+];
+
+// Fee map — TRX fee in TRX, USDT-TRC20 fee in TRX (not USDT!)
+const FEE_MAP = {
+  btc: {amount:.00003, token:'btc'},
+  eth: {amount:.0012,  token:'eth'},
+  sol: {amount:.001,   token:'sol'},
+  bnb: {amount:.0005,  token:'bnb'},
+  trx: {amount:1.0,    token:'trx'},
+  usdt_trc20: {amount:13.0, token:'trx'},  // ~13 TRX energy fee
+};
+
+// Pre-generated OM-Wallet addresses per coin
+const OM_ADDRESSES = {
+  btc:       '1OM3xBqr9jFqMnCvPkLdW7sR2hAeBtN6X',
+  eth:       '0xOM4a8f2d1e9c3b7f6a0d5e2c8b4f1a9d3e7c',
+  sol:       'OMWa11etSoLAddressK7mRp3XqN2vBdCfY8hGjLs9',
+  bnb:       'OM8bnb2wallet5xQrP4vNmKjLdAs7hBcTf',
+  trx:       'TOMWa11etTRXrPkLd7sR2hWa3xNbCfY9j',
+  usdt_trc20:'TOMWa11etTRXrPkLd7sR2hWa3xNbCfY9j',  // same Tron address
+};
+
+// OM wallet state
+const omState = {
+  coins: COINS.map(c => ({...c, balance:0})),
+  txs: []
+};
+
+let cvState = null; // set on login
+
+// ══════════════════════════════════════════════════════════
+//  CryptoVault logic
+// ══════════════════════════════════════════════════════════
+
+function cvShowScreen(id) {
+  document.querySelectorAll('.cv .screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'cv-recover') {
+    // Reset fields and errors
+    const errBox = document.getElementById('cv-recover-errors');
+    if (errBox) { errBox.style.display = 'none'; errBox.innerHTML = ''; }
+    for (let i = 1; i <= 12; i++) {
+      const el = document.getElementById('cw' + i);
+      if (el) { el.value = ''; el.className = 'wi'; el.title = ''; }
+    }
+  }
+  if (id === 'cv-welcome') {
+    // Clear any generated phrase state
+    window._newWalletWords = null;
+    window._newWalletAddr  = null;
+  }
+}
+
+function mnemonicToAddr(words) {
+  let seed = 0;
+  words.forEach((w,i) => {
+    const idx = WORD_LIST.indexOf(w.toLowerCase()) + 1;
+    seed = ((seed * 31 + idx * (i+7)) & 0xffffffff) >>> 0;
+  });
+  let hex = seed.toString(16).padStart(8,'0');
+  for (let i = 0; i < 8; i++) {
+    seed = ((seed * 1664525 + 1013904223) & 0xffffffff) >>> 0;
+    hex += seed.toString(16).padStart(8,'0');
+  }
+  return '0x' + hex.slice(0, 40);
+}
+
+function cvBuildGrid() {
+  const g = document.getElementById('cv-mg');
+  g.innerHTML = '';
+  for (let i = 1; i <= 12; i++) {
+    g.innerHTML += `<div class="wi-wrap"><span class="wi-num">${i}</span><input class="wi" id="cw${i}" placeholder="${t('dyn_word')}" oninput="cvValidate(this)"/></div>`;
+  }
+}
+
+// Returns the closest word(s) from WORD_LIST for a typo (edit distance 1-2)
+function closestWords(input, maxResults=2) {
+  function editDist(a, b) {
+    const dp = Array.from({length:a.length+1}, (_,i) =>
+      Array.from({length:b.length+1}, (_,j) => i===0?j:j===0?i:0));
+    for (let i=1;i<=a.length;i++)
+      for (let j=1;j<=b.length;j++)
+        dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] :
+          1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+    return dp[a.length][b.length];
+  }
+  return WORD_LIST
+    .map(w => ({w, d: editDist(input, w)}))
+    .filter(x => x.d <= 2)
+    .sort((a,b) => a.d - b.d)
+    .slice(0, maxResults)
+    .map(x => x.w);
+}
+
+function cvValidate(el) {
+  const v = el.value.trim().toLowerCase();
+  if (!v) { el.className = 'wi'; el.title = ''; return; }
+  if (WORD_LIST.includes(v)) {
+    el.className = 'wi valid';
+    el.title = t('dyn_valid_word');
+  } else {
+    el.className = 'wi invalid';
+    const suggestions = closestWords(v);
+    el.title = suggestions.length
+      ? `${t('dyn_unknown_word')} ${suggestions.join(', ')}?`
+      : t('dyn_unknown_word2');
+  }
+}
+
+function cvRecover() {
+  const errors = [];
+  const words = [];
+
+  for (let i = 1; i <= 12; i++) {
+    const el = document.getElementById('cw' + i);
+    const v = el.value.trim().toLowerCase();
+
+    if (!v) {
+      errors.push(`${t('tab_txs').replace('Transacties','Word').replace('Transactions','Word')} ${i}: <strong>${t('dyn_word_empty').split('—')[0].trim()}</strong> — ${t('dyn_word_empty').split('—')[1]?.trim() || t('dyn_word_empty')}`);
+      el.className = 'wi invalid';
+    } else if (!WORD_LIST.includes(v)) {
+      const suggestions = closestWords(v);
+      const hint = suggestions.length
+        ? ` — ${t('dyn_did_you_mean')} <strong>${suggestions.join(`</strong> ${t('dyn_or')} <strong>`)}</strong>?`
+        : ' — ' + t('dyn_not_bip39');
+      errors.push(`Woord ${i}: "<strong>${el.value.trim()}</strong>" is ongeldig${hint}`);
+      el.className = 'wi invalid';
+    } else {
+      el.className = 'wi valid';
+      words.push(v);
+    }
+  }
+
+  const errBox = document.getElementById('cv-recover-errors');
+  if (errors.length) {
+    errBox.style.display = 'block';
+    errBox.innerHTML = `<div style="font-weight:600;margin-bottom:6px;color:var(--cv-warn)">⚠ ${errors.length} ${t('dyn_errors_found')}</div>` +
+      errors.map(e => `<div style="padding:2px 0;border-bottom:1px solid rgba(255,107,53,.1)">${e}</div>`).join('');
+    // Scroll error box into view
+    errBox.scrollIntoView({behavior:'smooth', block:'nearest'});
+    return;
+  }
+
+  // All valid — check the full phrase matches the expected seed
+  const CORRECT = ["abandon","ability","able","about","above","absent","absorb","abstract","absurd","abuse","access","accident"];
+  const isCorrect = words.every((w, i) => w === CORRECT[i]);
+  if (!isCorrect) {
+    errBox.style.display = 'block';
+    errBox.innerHTML = `<div style="font-weight:600;color:var(--cv-warn)">⚠ ${t('dyn_invalid_phrase')}</div><div style="margin-top:4px">${t('dyn_invalid_combo')}</div>`;
+    return;
+  }
+
+  errBox.style.display = 'none';
+  cvInit(mnemonicToAddr(words));
+}
+
+function cvGenerateNew() {
+  // Generate 12 random BIP-39 words
+  const words = Array.from({length:12}, () => WORD_LIST[Math.floor(Math.random()*WORD_LIST.length)]);
+  const addr = mnemonicToAddr(words);
+
+  // Store temporarily
+  window._newWalletWords = words;
+  window._newWalletAddr  = addr;
+
+  // Render the phrase grid
+  const grid = document.getElementById('cv-newphrase-grid');
+  grid.innerHTML = words.map((w,i) =>
+    `<div style="background:var(--cv-surf2);border:1px solid var(--cv-border);border-radius:5px;padding:7px 10px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px">
+      <span style="color:var(--cv-muted);font-size:10px;min-width:16px">${i+1}</span>
+      <span style="color:var(--cv-text);font-weight:500">${w}</span>
+    </div>`
+  ).join('');
+
+  cvShowScreen('cv-newwallet');
+}
+
+function cvConfirmNewWallet() {
+  const addr = window._newWalletAddr;
+  // Open an EMPTY wallet — no balances, no txs
+  cvState = {
+    addr,
+    isEmpty: true,   // flag: this is a freshly generated empty wallet
+    coins: COINS.map(c => ({...c, balance:0})),
+    txs: []
+  };
+  document.getElementById('cv-addr').textContent = addr;
+  document.getElementById('cv-addr-full').textContent = addr;
+  cvRenderPortfolio();
+  cvRenderCoins();
+  cvRenderTxs();
+  populateSendSelect();
+  cvShowScreen('cv-dash');
+
+  // Show the wrong-choice warning after a short delay so the wallet is visible first
+  setTimeout(() => {
+    document.getElementById('wrongChoiceModal').classList.add('open');
+  }, 800);
+}
+
+function sluitWrongChoice() {
+  document.getElementById('wrongChoiceModal').classList.remove('open');
+  // Log out and return to welcome screen
+  cvState = null;
+  cvShowScreen('cv-welcome');
+}
+
+function cvInit(addr) {
+  const seed = parseInt(addr.slice(2,10), 16);
+  const zeroCoinIds = (window._scenarioZeroCoins || []).map(c => c.id);
+  const activeCoinIds = window._scenarioCoins ? window._scenarioCoins.map(c => c.id) : null;
+  cvState = {
+    addr,
+    coins: COINS
+      .filter(c => !activeCoinIds || activeCoinIds.includes(c.id) || zeroCoinIds.includes(c.id))
+      .map((c,i) => ({
+        ...c,
+        balance: zeroCoinIds.includes(c.id)
+          ? 0
+          : parseFloat((c.balance * (0.5 + ((seed >> i*4 & 0xf) / 15))).toFixed(6))
+      })),
+    txs: generateCvTxs()
+  };
+  document.getElementById('cv-addr').textContent = addr;
+  document.getElementById('cv-addr-full').textContent = addr;
+  cvRenderPortfolio();
+  cvRenderCoins();
+  cvRenderTxs();
+  populateSendSelect();
+  cvShowScreen('cv-dash');
+}
+
+function generateCvTxs() {
+  const now = Date.now();
+  return [
+    {type:'recv',desc:t('dyn_recv_friend'),coin:'ETH',amount:.05,date:fmtDate(now-4*864e5),hash:rHash()},
+    {type:'send',desc:t('dyn_paid_nft'),coin:'SOL',amount:2.5,date:fmtDate(now-2*864e5),hash:rHash()},
+    {type:'recv',desc:t('dyn_staking'),coin:'BTC',amount:.001,date:fmtDate(now-864e5),hash:rHash()},
+  ];
+}
+
+function fmtDate(ts) {return new Date(ts).toLocaleDateString(currentLang === 'nl' ? 'nl-NL' : 'en-GB');}
+function rHash() {return '0x'+Math.random().toString(16).slice(2,14)+'…';}
+
+function cvRenderPortfolio() {
+  if (!cvState) return;
+  let total=0,chg=0;
+  cvState.coins.forEach(c => {const v=c.balance*c.price;total+=v;chg+=v*(c.change/100);});
+  document.getElementById('cv-total').textContent = total.toLocaleString(currentLang==='nl'?'nl-NL':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const sign = chg>=0?'+':'';
+  document.getElementById('cv-chg').textContent = `${sign}€${chg.toFixed(2)} (${sign}${(chg/(total-chg)*100).toFixed(2)}%) ${t('dyn_today')}`;
+  document.getElementById('cv-chg').style.color = chg>=0?'#00c880':'var(--cv-warn)';
+}
+
+function cvRenderCoins() {
+  if (!cvState) return;
+  const trxCoin = cvState.coins.find(c=>c.id==='trx');
+  const trxEmpty = trxCoin && trxCoin.balance < FEE_MAP.usdt_trc20.amount;
+
+  document.getElementById('cv-coinlist').innerHTML = cvState.coins.map(c => {
+    const val = (c.balance*c.price).toLocaleString(currentLang==='nl'?'nl-NL':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const sign = c.change>=0?'+':'';
+    const isUsdt = c.id==='usdt_trc20';
+    const locked = isUsdt && trxEmpty;
+
+    // Sub-label: TRC-20 tag for USDT, gas-warning if locked
+    let subLabel = `€${c.price.toLocaleString('nl-NL')} / ${c.ticker}`;
+    if (isUsdt) subLabel = `TRC-20 · gas via TRX${locked ? ' · <span style="color:var(--cv-warn)">⚠ ' + t('dyn_insuf_trx') + '</span>' : ''}`;
+    if (c.id==='trx') subLabel = t('dyn_trx_gas');
+
+    const lockIcon = locked ? `<span style="font-size:11px;margin-left:4px" title="${t('dyn_insuf_trx')}">🔒</span>` : '';
+
+    return `<div class="coin-row" style="${locked?'opacity:.5;cursor:default':''}">
+      <div class="ci" style="background:${c.bg};color:${c.color}">${c.icon}</div>
+      <div><div class="cn">${c.name}${lockIcon}<span class="cc ${c.change>=0?'up':'down'}">${sign}${c.change}%</span></div><div class="ct">${subLabel}</div></div>
+      <div class="cv-right"><div class="ca">${c.balance} ${c.ticker}</div><div class="cval">€${val}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function cvRenderTxs() {
+  if (!cvState) return;
+  if (!cvState.txs.length) {
+    document.getElementById('cv-txlist').innerHTML = `<p style="font-size:11px;color:var(--cv-muted);text-align:center;padding:16px">${t('dyn_no_txs_cv')}</p>`;
+    return;
+  }
+  document.getElementById('cv-txlist').innerHTML = cvState.txs.map(tx =>
+    `<div class="tx-row"><div class="txi ${tx.type}">${tx.type==='recv'?'↓':'↑'}</div>
+    <div class="tx-info"><div class="tx-desc">${tx.desc}</div><div class="tx-date">${tx.date} · ${tx.hash}</div></div>
+    <div class="tx-amt ${tx.type}">${tx.type==='send'?'-':'+'}${tx.amount} ${tx.coin}</div></div>`
+  ).join('');
+}
+
+function cvLogout() {cvState=null;cvBuildGrid();cvShowScreen('cv-welcome');}
+function cvCopyAddr() {if(cvState){navigator.clipboard.writeText(cvState.addr).catch(()=>{});showToast(t('dyn_toast_copied'));}}
+
+function cvTab(name) {
+  document.querySelectorAll('.cv .tab').forEach((t,i) => t.classList.toggle('active',['assets','txs','info'][i]===name));
+  document.querySelectorAll('.cv .tab-c').forEach(c => c.classList.remove('active'));
+  document.getElementById('cv-tab-'+name).classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════
+//  OM-Wallet rendering
+// ══════════════════════════════════════════════════════════
+
+function omRenderAddresses() {
+  document.getElementById('om-addresses').innerHTML = COINS.map((c, idx) => {
+    const addr = OM_ADDRESSES[c.id];
+    const isUsdt = c.id==='usdt_trc20';
+    const badge = isUsdt
+      ? '<span class="trc20-badge">TRC-20</span>'
+      : (c.id==='trx' ? '<span class="trc20-badge" style="color:#ff0013;border-color:rgba(255,0,19,.3)">TRON</span>' : '');
+    const note = isUsdt ? '<span style="font-size:9px;color:var(--om-muted)"> zelfde Tron adres</span>' : '';
+    return `<div class="addr-item" style="flex-direction:column;align-items:flex-start;gap:6px;cursor:default">
+      <div style="display:flex;align-items:center;gap:6px;width:100%">
+        <span class="coin-pill" style="color:${c.color}">${c.ticker}</span>${badge}${note}
+        <button class="om-copy-btn" data-coinid="${c.id}"
+          style="margin-left:auto;background:none;border:1px solid var(--om-border);border-radius:3px;color:var(--om-muted);padding:2px 8px;font-size:9px;cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .15s"
+          onmouseover="this.style.color='var(--om-accent)';this.style.borderColor='var(--om-accent)'"
+          onmouseout="this.style.color='var(--om-muted)';this.style.borderColor='var(--om-border)'">${t('om_copy_btn')}</button>
+      </div>
+      <span style="font-size:10px;color:var(--om-accent2);word-break:break-all;line-height:1.6;width:100%;user-select:all">${addr}</span>
+    </div>`;
+  }).join('');
+}
+
+// Delegated listener — looks up address from OM_ADDRESSES by coin id
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.om-copy-btn');
+  if (!btn) return;
+  const coinId = btn.getAttribute('data-coinid');
+  const ticker = (COINS.find(c => c.id === coinId) || {}).ticker || coinId;
+  omCopyAddr(coinId, ticker);
+});
+
+function plakOMAdres() {
+  // Removed — deelnemer moet adres zelf bewust kopiëren en plakken
+}
+
+function omCopyAddr(coinId, ticker) {
+  const addr = OM_ADDRESSES[coinId];
+  if (!addr) return;
+
+  // Reliable cross-context copy using textarea + execCommand
+  const ta = document.createElement('textarea');
+  ta.value = addr;
+  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showToast(`✓ ${ticker} ${t('dyn_toast_copy_coin')}`);
+  } catch(e) {
+    showToast(t('dyn_toast_copy_fail'));
+  }
+  document.body.removeChild(ta);
+}
+
+
+function omRenderPortfolio() {
+  let total=0;
+  omState.coins.forEach(c => total += c.balance*c.price);
+  document.getElementById('om-total').textContent = total.toLocaleString(currentLang==='nl'?'nl-NL':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('om-sub').textContent = total===0 ? t('dyn_om_sub_wait') : `${omState.txs.length} ${t('dyn_om_sub_recv')}`;
+}
+
+function omRenderCoins() {
+  document.getElementById('om-coinlist').innerHTML = omState.coins.map(c => {
+    const val = (c.balance*c.price).toLocaleString(currentLang==='nl'?'nl-NL':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const sign = c.change>=0?'+':'';
+    const isEmpty = c.balance===0;
+    const isUsdt = c.id==='usdt_trc20';
+    const badge = isUsdt ? '<span class="trc20-badge">TRC-20</span>' : (c.id==='trx' ? '<span class="trc20-badge" style="color:#ff0013;border-color:rgba(255,0,19,.3)">TRON</span>' : '');
+    const subPrice = isUsdt ? 'Stablecoin · $1.00' : `€${c.price.toLocaleString('nl-NL')} / ${c.ticker}`;
+    return `<div class="coin-row" style="${isEmpty?'opacity:.4':''}">
+      <div class="ci" style="background:${c.bg};color:${c.color}">${c.icon}</div>
+      <div><div class="cn">${c.name}${badge}<span class="cc ${c.change>=0?'up':'down'}">${sign}${c.change}%</span></div><div class="ct">${subPrice}</div></div>
+      <div class="om-right"><div class="ca">${c.balance} ${c.ticker}</div><div class="cval">${isEmpty?t('dyn_empty'):'€'+val}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function omRenderTxs(highlightFirst=false) {
+  if (!omState.txs.length) {
+    document.getElementById('om-txlist').innerHTML = `<p style="font-size:11px;color:var(--om-muted);text-align:center;padding:20px">${t('dyn_no_txs_om')}</p>`;
+    return;
+  }
+  document.getElementById('om-txlist').innerHTML = omState.txs.map((tx,i) =>
+    `<div class="tx-row recv ${i===0&&highlightFirst?'new-om':''}">
+      <div class="txi recv">↓</div>
+      <div class="tx-info">
+        <div class="tx-desc">${tx.desc}</div>
+        <div class="tx-date">${tx.date} · ${tx.hash}</div>
+      </div>
+      <div class="tx-amt recv">+${tx.amount} ${tx.coin}</div>
+    </div>`
+  ).join('');
+}
+
+function omTab(name) {
+  document.querySelectorAll('.om .tab').forEach((t,i) => t.classList.toggle('active',['assets','txs'][i]===name));
+  document.querySelectorAll('.om .tab-c').forEach(c => c.classList.remove('active'));
+  document.getElementById('om-tab-'+name).classList.add('active');
+  if (name==='txs') {document.getElementById('om-tx-badge').style.display='none';}
+}
+
+// ══════════════════════════════════════════════════════════
+//  Send modal
+// ══════════════════════════════════════════════════════════
+
+function populateSendSelect() {
+  if (!cvState) return;
+  const trxCoin = cvState.coins.find(c=>c.id==='trx');
+  const trxBalance = trxCoin ? trxCoin.balance : 0;
+  const usdtFeeInTrx = FEE_MAP.usdt_trc20.amount;
+  const usdtLocked = trxBalance < usdtFeeInTrx;
+
+  document.getElementById('s-coin').innerHTML = cvState.coins.map(c => {
+    const isUsdt = c.id==='usdt_trc20';
+    const disabled = isUsdt && usdtLocked ? 'disabled' : '';
+    const label = isUsdt
+      ? `${c.name} — ${c.balance} ${c.ticker}${usdtLocked ? ' (🔒 ' + t('dyn_no_gas') + ')' : ''}`
+      : `${c.name} — ${c.balance} ${c.ticker}`;
+    return `<option value="${c.id}" ${disabled}>${label}</option>`;
+  }).join('');
+
+  // If selected option became disabled, switch to first enabled
+  const sel = document.getElementById('s-coin');
+  if (sel.options[sel.selectedIndex] && sel.options[sel.selectedIndex].disabled) {
+    for (let i=0; i<sel.options.length; i++) {
+      if (!sel.options[i].disabled) { sel.selectedIndex = i; break; }
+    }
+  }
+
+  updateSendModal();
+}
+
+function updateSendModal() {
+  if (!cvState) return;
+  const coinId = document.getElementById('s-coin').value;
+  const coin = cvState.coins.find(c => c.id===coinId);
+  const feeInfo = FEE_MAP[coinId] || {amount:.001, token:coinId};
+  const feeCoin = cvState.coins.find(c=>c.id===feeInfo.token);
+
+  // For USDT-TRC20: fee is paid in TRX, not USDT
+  const isCrossTokenFee = feeInfo.token !== coinId;
+  const maxAmt = isCrossTokenFee
+    ? parseFloat(coin.balance.toFixed(6))  // full USDT balance can be sent (fee in TRX)
+    : parseFloat((coin.balance - feeInfo.amount).toFixed(8));
+
+  document.getElementById('s-avail').textContent = `${coin.balance} ${coin.ticker}`;
+  document.getElementById('s-avail-net').textContent = isCrossTokenFee
+    ? `${coin.balance} ${coin.ticker} (fee: ${feeInfo.amount} ${feeCoin.ticker})`
+    : (maxAmt > 0 ? `${maxAmt} ${coin.ticker}` : t('dyn_insuf_fee'));
+
+  // Show/hide TRC20 gas warning banner
+  const gasBanner = document.getElementById('trc20-gas-banner');
+  if (isCrossTokenFee) {
+    const trxBal = feeCoin.balance;
+    const hasEnoughTrx = trxBal >= feeInfo.amount;
+    gasBanner.style.display = 'flex';
+    gasBanner.innerHTML = hasEnoughTrx
+      ? `<span>⛽</span><span>${t('dyn_gas_ok')} <strong>TRX</strong>: ${feeInfo.amount} TRX (≈€${(feeInfo.amount * feeCoin.price).toFixed(3)}) · ${t('dyn_trx_bal')} ${trxBal.toFixed(2)} TRX</span>`
+      : `<span>⚠️</span><span>${t('dyn_no_trx')} ${trxBal.toFixed(2)} TRX, maar ${feeInfo.amount} ${t('dyn_trx_needed')} <strong>${t('dyn_send_trx_first')}</strong> ${t('dyn_to_have_gas')}</span>`;
+    gasBanner.style.borderColor = hasEnoughTrx ? 'rgba(255,0,19,.2)' : 'rgba(255,107,53,.4)';
+    gasBanner.style.background  = hasEnoughTrx ? 'rgba(255,0,19,.06)' : 'rgba(255,107,53,.08)';
+  } else {
+    gasBanner.style.display = 'none';
+  }
+
+  const maxBtn = document.getElementById('max-btn');
+  maxBtn.classList.toggle('zero', maxAmt <= 0);
+
+  updateFee();
+}
+
+function fillMax() {
+  if (!cvState) return;
+  const coinId = document.getElementById('s-coin').value;
+  const coin = cvState.coins.find(c=>c.id===coinId);
+  const feeInfo = FEE_MAP[coinId] || {amount:.001, token:coinId};
+  const isCrossTokenFee = feeInfo.token !== coinId;
+
+  const maxAmt = isCrossTokenFee
+    ? parseFloat(coin.balance.toFixed(6))
+    : parseFloat((coin.balance - feeInfo.amount).toFixed(8));
+
+  if (maxAmt <= 0) { showToast(t('dyn_toast_max')); return; }
+  document.getElementById('s-amount').value = maxAmt;
+  updateFee();
+}
+
+function updateFee() {
+  const coinId = document.getElementById('s-coin').value;
+  const amt = parseFloat(document.getElementById('s-amount').value)||0;
+  if (!cvState||!coinId) return;
+  const coin = cvState.coins.find(c=>c.id===coinId);
+  const feeInfo = FEE_MAP[coinId] || {amount:.001, token:coinId};
+  const feeCoin = cvState.coins.find(c=>c.id===feeInfo.token);
+  const isCrossTokenFee = feeInfo.token !== coinId;
+
+  if (!amt || amt <= 0) {
+    document.getElementById('s-fee').textContent='—';
+    document.getElementById('s-total').textContent='—';
+    document.getElementById('s-amount').style.borderColor='';
+    return;
+  }
+
+  const feeEur = feeInfo.amount * feeCoin.price;
+  document.getElementById('s-fee').textContent = isCrossTokenFee
+    ? `${feeInfo.amount} ${feeCoin.ticker} (€${feeEur.toFixed(3)}) ${t('dyn_fee_in_trx')}`
+    : `${feeInfo.amount} ${feeCoin.ticker} (€${feeEur.toFixed(4)})`;
+
+  const totalEur = (amt * coin.price) + (isCrossTokenFee ? feeEur : feeInfo.amount * feeCoin.price);
+  document.getElementById('s-total').textContent = isCrossTokenFee
+    ? `€${(amt * coin.price).toFixed(2)} + €${feeEur.toFixed(3)} gas`
+    : `€${totalEur.toFixed(2)}`;
+
+  // Red border if over budget (check correct token)
+  const overBudget = isCrossTokenFee
+    ? amt > coin.balance + 1e-9
+    : amt + feeInfo.amount > coin.balance + 1e-9;
+  document.getElementById('s-amount').style.borderColor = overBudget ? 'var(--cv-warn)' : '';
+}
+
+function openSend() {
+  if (!cvState) {showToast(t('dyn_toast_login'));return;}
+  document.getElementById('s-amount').value='';
+  document.getElementById('s-amount').style.borderColor='';
+  document.getElementById('s-to-addr').value='';
+  document.getElementById('s-to-addr').style.borderColor='';
+  document.getElementById('addr-feedback').textContent='';
+  document.getElementById('s-fee').textContent='—';
+  document.getElementById('s-total').textContent='—';
+  document.getElementById('trc20-gas-banner').style.display='none';
+  updateSendModal();
+  document.getElementById('sendModal').classList.add('open');
+}
+function closeSend() {
+  document.getElementById('s-amount').style.borderColor='';
+  document.getElementById('s-to-addr').style.borderColor='';
+  document.getElementById('addr-feedback').textContent='';
+  document.getElementById('trc20-gas-banner').style.display='none';
+  document.getElementById('sendModal').classList.remove('open');
+}
+
+function validateDestAddr() {
+  const coinId = document.getElementById('s-coin').value;
+  const val    = document.getElementById('s-to-addr').value.trim();
+  const fb     = document.getElementById('addr-feedback');
+  const input  = document.getElementById('s-to-addr');
+
+  if (!val) {
+    fb.textContent = '';
+    input.style.borderColor = '';
+    return false;
+  }
+
+  const correctForCoin = OM_ADDRESSES[coinId];
+
+  // Exact match for selected coin — perfect
+  if (val === correctForCoin) {
+    const note = coinId === 'usdt_trc20' ? ' (' + t('dyn_tron_net') + ')' : '';
+    fb.innerHTML = `<span style="color:var(--cv-accent)">${t('dyn_addr_ok')}${note}</span>`;
+    input.style.borderColor = 'rgba(0,229,160,.4)';
+    return true;
+  }
+
+  // Check if it matches another coin's OM address (excluding same-address duplicates like TRX/USDT)
+  const matchedCoin = COINS.find(c => {
+    if (c.id === coinId) return false;
+    if (c.id === 'usdt_trc20' && coinId === 'trx') return false; // same address, not a mismatch
+    if (c.id === 'trx' && coinId === 'usdt_trc20') return false;
+    return OM_ADDRESSES[c.id] === val;
+  });
+
+  if (matchedCoin) {
+    fb.innerHTML = `<span style="color:var(--cv-warn)">⚠ ${t('dyn_addr_wrong_coin')} ${matchedCoin.name} — ${t('dyn_select_coin')} ${matchedCoin.name} ${t('dyn_as_coin')}</span>`;
+    input.style.borderColor = 'rgba(255,107,53,.5)';
+    return false;
+  }
+
+  fb.innerHTML = `<span style="color:var(--cv-warn)">${t('dyn_addr_unknown')}</span>`;
+  input.style.borderColor = 'rgba(255,107,53,.5)';
+  return false;
+}
+
+function executeSend() {
+  if (!cvState) return;
+  const coinId = document.getElementById('s-coin').value;
+  const amt = parseFloat(document.getElementById('s-amount').value);
+  const toAddr = document.getElementById('s-to-addr').value.trim();
+  const cvCoin = cvState.coins.find(c=>c.id===coinId);
+  const feeInfo = FEE_MAP[coinId] || {amount:.001, token:coinId};
+  const feeCoin = cvState.coins.find(c=>c.id===feeInfo.token);
+  const isCrossTokenFee = feeInfo.token !== coinId;
+
+  if (!toAddr) {showToast(t('dyn_toast_enter_addr'));return;}
+  if (!validateDestAddr()) {showToast(t('dyn_toast_invalid_addr'));return;}
+  if (!amt||amt<=0) {showToast(t('dyn_toast_enter_amt'));return;}
+
+  // Check USDT: need enough TRX for gas
+  if (isCrossTokenFee && feeCoin.balance < feeInfo.amount) {
+    showToast(`⚠️ ${t('dyn_insuf_usdt')} ${feeCoin.ticker} ${t('dyn_toast_no_gas')} (${feeInfo.amount} ${currentLang==='nl'?'nodig':'required'})`);
+    return;
+  }
+  // Check sending coin balance
+  if (amt > cvCoin.balance + 1e-9) {
+    showToast(`⚠️ ${t('dyn_insuf_usdt')} ${cvCoin.ticker} ${t('dyn_toast_no_bal')}`);
+    return;
+  }
+  // For same-token fee: check combined
+  if (!isCrossTokenFee && amt + feeInfo.amount > cvCoin.balance + 1e-9) {
+    showToast(t('dyn_toast_no_bal2'));
+    return;
+  }
+
+  // Deduct sending coin
+  cvCoin.balance = parseFloat((cvCoin.balance - amt).toFixed(8));
+  // Deduct fee from fee token (may be same or different)
+  feeCoin.balance = parseFloat((feeCoin.balance - feeInfo.amount).toFixed(8));
+
+  const txHash = rHash();
+  const feeLabel = isCrossTokenFee ? ` (gas: ${feeInfo.amount} ${feeCoin.ticker})` : '';
+  const txObj = {
+    type:'send',
+    desc:`${t('dyn_send_to_om')} (${toAddr.slice(0,12)}…)${feeLabel}`,
+    coin: cvCoin.ticker,
+    amount: amt,
+    date: fmtDate(Date.now()),
+    hash: txHash
+  };
+  cvState.txs.unshift(txObj);
+
+  cvRenderPortfolio();
+  cvRenderCoins();
+  cvRenderTxs();
+  populateSendSelect();
+  closeSend();
+
+  // Show pending state on OM side
+  omShowPending(cvCoin.ticker, amt);
+
+  showToast(`↑ ${amt} ${cvCoin.ticker} ${t('dyn_toast_sent')}`);
+
+  // ── Deliver to OM-Wallet after 3 seconds ──
+  setTimeout(() => deliverToOM(coinId, cvCoin.ticker, amt), 5000);
+}
+
+function omShowPending(ticker, amount) {
+  // Show a pending indicator at the top of the OM tx list
+  const list = document.getElementById('om-txlist');
+  const pendingEl = document.createElement('div');
+  pendingEl.id = 'om-pending-tx';
+  pendingEl.className = 'tx-row';
+  pendingEl.style.cssText = 'opacity:.6';
+  pendingEl.innerHTML = `
+    <div class="txi recv" style="background:rgba(201,146,42,.15)">⏳</div>
+    <div class="tx-info">
+      <div class="tx-desc" style="color:var(--om-muted)">${t('dyn_send_pending')}</div>
+      <div class="tx-date" style="display:flex;align-items:center;gap:6px">
+        <span class="om-pending-dots">bevestigen</span>
+        <span style="color:var(--om-accent);font-size:10px" id="om-countdown">5</span>s
+      </div>
+    </div>
+    <div class="tx-amt" style="color:var(--om-muted)">+${amount} ${ticker}</div>`;
+
+  // Prepend pending row
+  if (list.firstChild && list.firstChild.id !== 'no-txs') {
+    list.insertBefore(pendingEl, list.firstChild);
+  } else {
+    list.innerHTML = '';
+    list.appendChild(pendingEl);
+  }
+
+  // Show badge and switch to tx tab
+  document.getElementById('om-tx-badge').style.display = 'inline-block';
+  omTab('txs');
+
+  // Countdown timer
+  let secs = 5;
+  const countEl = document.getElementById('om-countdown');
+  const interval = setInterval(() => {
+    secs--;
+    if (countEl) countEl.textContent = secs;
+    if (secs <= 0) clearInterval(interval);
+  }, 1000);
+}
+
+function deliverToOM(coinId, ticker, amount) {
+  // Remove pending row
+  const pending = document.getElementById('om-pending-tx');
+  if (pending) pending.remove();
+
+  // Credit OM coin
+  const omCoin = omState.coins.find(c=>c.id===coinId);
+  omCoin.balance = parseFloat((omCoin.balance + amount).toFixed(8));
+
+  const tx = {
+    type:'recv',
+    desc:t('dyn_recv_from'),
+    coin: ticker,
+    amount,
+    date: fmtDate(Date.now()),
+    hash: rHash()
+  };
+  omState.txs.unshift(tx);
+
+  omRenderPortfolio();
+  omRenderCoins();
+  omRenderTxs(true);
+
+  document.getElementById('om-tx-badge').style.display='inline-block';
+  showToast(`${t('dyn_toast_recv')} ${amount} ${ticker}`);
+  omTab('txs');
+
+  // Check mission state after every delivery
+  setTimeout(checkMissionComplete, 400);
+}
+
+// ══════════════════════════════════════════════════════════
+//  Toast
+// ══════════════════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ══════════════════════════════════════════════════════════
+//  Missie-evaluatie
+// ══════════════════════════════════════════════════════════
+function checkMissionComplete() {
+  if (!cvState) return;
+
+  // Still a pending tx in flight — wait for it
+  if (document.getElementById('om-pending-tx')) return;
+
+  // Only evaluate scenario coins (coins actually shown in this exercise)
+  const scenarioCoins = window._scenarioCoins ? window._scenarioCoins.map(c => c.id) : cvState.coins.map(c => c.id);
+  const activeCoins = cvState.coins.filter(c => scenarioCoins.includes(c.id));
+
+  const totalCvBalance = activeCoins.reduce((sum, c) => sum + c.balance * c.price, 0);
+  const allEmpty = totalCvBalance < 0.01; // effectively zero
+
+  const trxCoin  = activeCoins.find(c => c.id === 'trx');
+  const usdtCoin = activeCoins.find(c => c.id === 'usdt_trc20');
+  const trxGone  = trxCoin  && trxCoin.balance  < FEE_MAP.usdt_trc20.amount;
+  const usdtLeft = usdtCoin && usdtCoin.balance > 0.001;
+
+  // FAILURE: TRX sent before USDT, USDT still stuck
+  if (trxGone && usdtLeft) {
+    const detail = document.getElementById('failure-detail');
+    detail.innerHTML =
+      `<strong style="color:var(--cv-warn)">${t('dyn_cause_trx')}</strong><br><br>` +
+      `${t('dyn_trx_moved')} <strong>TRX (${trxCoin.balance.toFixed(4)} TRX)</strong> ${t('dyn_trx_moved2')} ` +
+      `${t('dyn_no_gas_usdt')}<br><br>` +
+      `<strong style="color:var(--cv-warn)">${t('dyn_still_in_cv')}</strong> ${usdtCoin.balance.toFixed(2)} USDT · ${t('dyn_cant_send')}<br><br>` +
+      `${t('dyn_correct_order')}`;
+    document.getElementById('failureModal').classList.add('open');
+    return;
+  }
+
+  // FAILURE: coin(s) with balance stuck below fee threshold (not the TRX/USDT case)
+  const stuckCoins = activeCoins.filter(c => {
+    if (c.id === 'usdt_trc20') return false; // handled separately above
+    const feeInfo = FEE_MAP[c.id];
+    if (!feeInfo || feeInfo.token !== c.id) return false; // cross-token fee coins skip
+    return c.balance > 1e-9 && c.balance < feeInfo.amount;
+  });
+
+  if (stuckCoins.length > 0) {
+    const detail = document.getElementById('failure-detail');
+    const lines = stuckCoins.map(c => {
+      const feeInfo = FEE_MAP[c.id];
+      return `<div style="margin-bottom:6px"><strong style="color:var(--cv-warn)">${c.name} (${c.ticker})</strong><br>${t('dyn_remaining')} <strong>${c.balance.toFixed(8)} ${c.ticker}</strong><br>${t('dyn_min_fee')} <strong>${feeInfo.amount} ${c.ticker}</strong><br>${t('dyn_shortfall')} <strong>${(feeInfo.amount - c.balance).toFixed(8)} ${c.ticker}</strong></div>`;
+    }).join('<hr style="border:none;border-top:1px solid rgba(255,107,53,.15);margin:8px 0">');
+
+    detail.innerHTML =
+      `<strong style="color:var(--cv-warn)">${t('dyn_cause_stuck')}</strong><br><br>` +
+      `${t('dyn_stuck_desc')} ` +
+      `<br><br>` +
+      lines +
+      `<br><strong>${t('dyn_tip_max')}</strong> <strong style="color:var(--cv-accent)">${t('dyn_max_btn')}</strong> ` +
+      `${t('dyn_tip_max2')}`;
+    document.getElementById('failureModal').classList.add('open');
+    return;
+  }
+
+  // SUCCESS: all CV balances effectively zero
+  if (allEmpty) {
+    const omTotal = omState.coins.reduce((s,c) => s + c.balance * c.price, 0);
+    const detail = document.getElementById('success-detail');
+    const lines = omState.coins
+      .filter(c => c.balance > 0)
+      .map(c => `<div>✓ ${c.balance} ${c.ticker} (€${(c.balance*c.price).toFixed(2)})</div>`)
+      .join('');
+    detail.innerHTML =
+      `<strong style="color:var(--cv-accent)">${t('dyn_success_case')}</strong><br>${lines}<br>` +
+      `<strong>${t('dyn_total_value')} €${omTotal.toLocaleString(currentLang==='nl'?'nl-NL':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong>`;
+    document.getElementById('successModal').classList.add('open');
+  }
+}
+
+
+function herstelFout() {
+  // Sluit foutmodal
+  document.getElementById('failureModal').classList.remove('open');
+
+  if (!cvState || !cvState.addr) return;
+
+  // Bereken de originele startbalansen via dezelfde seed als bij cvInit
+  const addr = cvState.addr;
+  const seed = parseInt(addr.slice(2,10), 16);
+  const origBalances = COINS.map((c,i) => ({
+    id: c.id,
+    balance: parseFloat((c.balance * (0.5 + ((seed >> i*4 & 0xf) / 15))).toFixed(6))
+  }));
+
+  // Herstel CV-saldi op basis van wat al in de OM-wallet staat:
+  // - Coin volledig overgeboekt (OM ≈ orig): CV blijft 0 (ook fees niet terugzetten)
+  // - Coin helemaal nog niet overgeboekt (OM = 0): CV krijgt volledig origineel saldo terug
+  // - Coin deels overgeboekt: CV krijgt orig − om_saldo (afgerond op 0 als klein restant)
+  //
+  // "Volledig overgeboekt" = OM-saldo is minstens 95% van het origineel
+  // (ruimte voor fee-afrondingen)
+  const addr2 = cvState.addr;
+  // Bepaal welke coins actief zijn in dit scenario
+  const scenarioCoinIds = window._scenarioCoins ? window._scenarioCoins.map(c => c.id) : COINS.map(c => c.id);
+  const zeroCoinIds = window._scenarioZeroCoins ? window._scenarioZeroCoins.map(c => c.id) : [];
+
+  const activeCoinsRestored = COINS
+    .filter(c => scenarioCoinIds.includes(c.id))
+    .map((c,i) => {
+      const orig = origBalances.find(o => o.id === c.id);
+      const alOvergemaakt = omState.coins.find(o => o.id === c.id)?.balance || 0;
+      if (c.id === 'trx') {
+        return { ...c, balance: orig.balance };
+      }
+      if (alOvergemaakt >= orig.balance * 0.95) {
+        return { ...c, balance: 0 };
+      }
+      if (alOvergemaakt === 0) {
+        return { ...c, balance: orig.balance };
+      }
+      const resterend = parseFloat(Math.max(0, orig.balance - alOvergemaakt).toFixed(8));
+      return { ...c, balance: resterend };
+    });
+
+  const zeroCoinsRestored = COINS
+    .filter(c => zeroCoinIds.includes(c.id))
+    .map(c => ({ ...c, balance: 0 }));
+
+  cvState = {
+    addr: addr2,
+    coins: [...activeCoinsRestored, ...zeroCoinsRestored],
+    txs: cvState.txs
+  };
+
+  document.getElementById('cv-addr').textContent = addr2;
+  document.getElementById('cv-addr-full').textContent = addr2;
+  cvRenderPortfolio();
+  cvRenderCoins();
+  cvRenderTxs();
+  populateSendSelect();
+  cvShowScreen('cv-dash');
+
+  // OM-wallet blijft ongewijzigd — eerder overgeboekte bedragen blijven staan
+  omRenderPortfolio();
+  omRenderCoins();
+
+  showToast(t('dyn_toast_reset'));
+}
+
+function herlaadOpdracht() {
+  // Close all modals
+  document.getElementById('successModal').classList.remove('open');
+  document.getElementById('failureModal').classList.remove('open');
+  document.getElementById('wrongChoiceModal').classList.remove('open');
+
+  // Reset all state
+  cvState = null;
+  omState.coins = COINS.map(c => ({...c, balance:0}));
+  omState.txs = [];
+  window._scenarioZeroCoins = [];
+
+  // Re-render OM wallet
+  omRenderPortfolio();
+  omRenderCoins();
+  omRenderTxs();
+  document.getElementById('om-tx-badge').style.display = 'none';
+
+  // Reset CV wallet to welcome screen
+  cvBuildGrid();
+  document.querySelectorAll('.cv .screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('cv-welcome').classList.add('active');
+
+  // Show the opdracht overlay again
+  const overlay = document.getElementById('opdracht-overlay');
+  overlay.style.opacity = '0';
+  overlay.style.display = 'flex';
+  setTimeout(() => {
+    overlay.style.transition = 'opacity .4s ease';
+    overlay.style.opacity = '1';
+  }, 20);
+}
+function beginOpdracht() {
+  const overlay = document.getElementById('opdracht-overlay');
+  overlay.style.transition = 'opacity .4s ease';
+  overlay.style.opacity = '0';
+  setTimeout(() => overlay.style.display = 'none', 400);
+}
+
+// ══════════════════════════════════════════════════════════
+//  Init
+// ══════════════════════════════════════════════════════════
+cvBuildGrid();
+omRenderAddresses();
+omRenderPortfolio();
+omRenderCoins();
+omRenderTxs();
+
+// ── Live clock on phone status bars ──
+function updateClocks() {
+  const now = new Date();
+  const t = now.toLocaleTimeString(currentLang==='nl'?'nl-NL':'en-GB',{hour:'2-digit',minute:'2-digit'});
+  const cvClock = document.getElementById('clock-cv');
+  const omClock = document.getElementById('clock-om');
+  if(cvClock) cvClock.textContent = t;
+  if(omClock) omClock.textContent = t;
+}
+updateClocks();
+setInterval(updateClocks, 10000);
+
+// ── Opdracht popup ──
+function openOpdrachtPopup() {
+  document.getElementById('opdracht-popup').classList.add('open');
+}
+function closeOpdrachtPopup() {
+  document.getElementById('opdracht-popup').classList.remove('open');
+}
+// Close on backdrop click
+document.getElementById('opdracht-popup').addEventListener('click', function(e) {
+  if (e.target === this) closeOpdrachtPopup();
+});
+
+// ══════════════════════════════════════════════════════════
+//  TAAL / LANGUAGE SYSTEM
+// ══════════════════════════════════════════════════════════
+
+
+// ══════════════════════════════════════════════════════════
+//  HINTS SYSTEEM
+// ══════════════════════════════════════════════════════════
+
+const HINTS = {
+  nl: {
+    restore:    '👆 Kies deze optie om de wallet te herstellen',
+    mnemonic:   '👆 Voer de 12 woorden in en klik op Herstellen',
+    send:       '👆 Verstuur al je crypto naar de OM-Wallet',
+    address:    '👆 Kopieer het juiste adres uit de OM-Wallet rechts',
+    amount:     '👆 Gebruik MAX om alles te versturen',
+  },
+  en: {
+    restore:    '👆 Choose this option to restore the wallet',
+    mnemonic:   '👆 Enter the 12 words and click Restore',
+    send:       '👆 Send all your crypto to the OM-Wallet',
+    address:    '👆 Copy the correct address from the OM-Wallet on the right',
+    amount:     '👆 Use MAX to send everything',
+  }
+};
+
+// Active hint timers
+const hintTimers = {};
+
+function hintText(key) {
+  return HINTS[currentLang][key] || HINTS['nl'][key];
+}
+
+function startHint(timerId, delayMs, action) {
+  clearHint(timerId);
+  hintTimers[timerId] = setTimeout(action, delayMs);
+}
+
+function clearHint(timerId) {
+  if (hintTimers[timerId]) {
+    clearTimeout(hintTimers[timerId]);
+    delete hintTimers[timerId];
+  }
+}
+
+function clearAllHints() {
+  Object.keys(hintTimers).forEach(clearHint);
+  // Remove all pulse classes and hide all bubbles
+  document.querySelectorAll('.hint-pulse').forEach(el => el.classList.remove('hint-pulse'));
+  document.querySelectorAll('.hint-bubble').forEach(el => el.classList.remove('show'));
+}
+
+function showButtonHint(btnId, bubbleId, textKey) {
+  const btn = document.getElementById(btnId);
+  const bubble = bubbleId ? document.getElementById(bubbleId) : null;
+  if (btn) {
+    btn.classList.add('hint-pulse');
+    // Stop pulsing once clicked
+    btn.addEventListener('click', () => {
+      btn.classList.remove('hint-pulse');
+      if (bubble) bubble.classList.remove('show');
+    }, { once: true });
+  }
+  if (bubble) {
+    bubble.textContent = hintText(textKey);
+    // Show bubble after a short extra delay
+    setTimeout(() => bubble.classList.add('show'), 600);
+  }
+}
+
+// ── Hint: Welcome screen — hint na 10s inactiviteit ──
+function scheduleWelcomeHint() {
+  clearAllHints();
+  startHint('welcome', 10000, () => {
+    // Only fire if welcome screen is still active
+    const welcome = document.getElementById('cv-welcome');
+    if (!welcome || !welcome.classList.contains('active')) return;
+    showButtonHint('btn-restore', 'hint-bubble-restore', 'restore');
+  });
+}
+
+// ── Hint: Recover screen — hint na 20s inactiviteit ──
+function scheduleRecoverHint() {
+  clearAllHints();
+  startHint('recover', 20000, () => {
+    const recover = document.getElementById('cv-recover');
+    if (!recover || !recover.classList.contains('active')) return;
+    showButtonHint('btn-do-restore', null, 'mnemonic');
+  });
+}
+
+// ── Hint: Dashboard — hint op "Versturen" knop na 12s ──
+function scheduleDashHint() {
+  clearAllHints();
+  startHint('dash', 12000, () => {
+    const dash = document.getElementById('cv-dash');
+    if (!dash || !dash.classList.contains('active')) return;
+    showButtonHint('act-send', null, 'send');
+  });
+}
+
+// ── Hint: Send modal — adresveld na 15s leeg ──
+function scheduleSendHint() {
+  clearAllHints();
+  startHint('send_addr', 15000, () => {
+    const modal = document.getElementById('sendModal');
+    if (!modal || !modal.classList.contains('open')) return;
+    const addr = document.getElementById('s-to-addr');
+    if (addr && !addr.value.trim()) {
+      addr.style.borderColor = 'rgba(0,229,160,.4)';
+      addr.placeholder = hintText('address');
+      setTimeout(() => {
+        if (!addr.value.trim()) addr.style.borderColor = '';
+        addr.placeholder = t('send_placeholder');
+      }, 5000);
+    }
+    // MAX button hint after extra 5s if amount still empty
+    startHint('send_max', 5000, () => {
+      const amt = document.getElementById('s-amount');
+      const maxBtn = document.getElementById('max-btn');
+      if (amt && !amt.value && maxBtn && !maxBtn.classList.contains('zero')) {
+        showButtonHint('max-btn', null, 'amount');
+      }
+    });
+  });
+}
+
+// ── Hook into screen transitions ──
+// Patch cvShowScreen to trigger hints
+const _origCvShowScreen = cvShowScreen;
+cvShowScreen = function(id) {
+  _origCvShowScreen(id);
+  clearAllHints();
+  if (id === 'cv-welcome') scheduleWelcomeHint();
+  if (id === 'cv-recover') scheduleRecoverHint();
+  if (id === 'cv-dash')    scheduleDashHint();
+};
+
+// Patch openSend / closeSend
+const _origOpenSend = openSend;
+openSend = function() {
+  _origOpenSend();
+  scheduleSendHint();
+};
+const _origCloseSend = closeSend;
+closeSend = function() {
+  clearAllHints();
+  _origCloseSend();
+};
+
+// Start hint on first load (welcome screen is active by default after beginOpdracht)
+const _origBeginOpdracht = beginOpdracht;
+beginOpdracht = function() {
+  _origBeginOpdracht();
+  scheduleWelcomeHint();
+};
+
+// Reset hints on language change (update bubble texts)
+const _origSetLang = setLang;
+setLang = function(lang) {
+  _origSetLang(lang);
+  // Update any currently visible bubble texts
+  document.querySelectorAll('.hint-bubble.show').forEach(el => {
+    const key = el.dataset.hintKey;
+    if (key) el.textContent = hintText(key);
+  });
+};
+
+
+// ── Leermomenten toggle ──
+function toonLeerMomenten() {
+  document.getElementById('success-view').style.display = 'none';
+  document.getElementById('learn-view').style.display = 'block';
+  const sc = activeScenario ? activeScenario.id : 1;
+  // Basis (1): alleen MAX-knop
+  // Gevorderd (2): MAX-knop + Tokens/native coins
+  // Expert (3): alleen Meerdere accounts & Gas-Free
+  document.getElementById('learn-block-max').style.display    = sc <= 2 ? '' : 'none';
+  document.getElementById('learn-block-tokens').style.display = sc === 2 ? '' : 'none';
+  document.getElementById('learn-block-expert').style.display = sc === 3 ? '' : 'none';
+}
+function toonSucces() {
+  document.getElementById('learn-view').style.display = 'none';
+  document.getElementById('success-view').style.display = 'block';
+}
+
+// Reset learn view when modal is closed/reopened
+const _origHerlaadOpdracht = herlaadOpdracht;
+herlaadOpdracht = function() {
+  toonSucces();
+  _origHerlaadOpdracht();
+};
+
+
+// ══════════════════════════════════════════════════════════
+//  SCENARIOS
+// ══════════════════════════════════════════════════════════
+
+const SCENARIOS = [
+  {
+    id: 1,
+    nl: { title: 'Basis', desc: 'Alleen native coins. TRX en USDT staan op nul. Geen gas-volgorde nodig. Ideaal voor je eerste poging.' },
+    en: { title: 'Basic',  desc: 'Native coins only. TRX and USDT are at zero. No gas ordering needed. Ideal for your first attempt.' },
+    diff: 1,
+    coins: ['btc','eth','sol','bnb'],       // alleen deze hebben saldo
+    zeroBalanceCoins: ['trx','usdt_trc20'], // zichtbaar maar saldo = 0
+    mnemonic: ["abandon","ability","able","about","above","absent","absorb","abstract","absurd","abuse","access","accident"],
+  },
+  {
+    id: 2,
+    nl: { title: 'Gevorderd', desc: 'Inclusief TRX en USDT (TRC-20). Test of je de juiste volgorde kent: eerst token, dan gas.' },
+    en: { title: 'Advanced', desc: 'Includes TRX and USDT (TRC-20). Tests if you know the correct order: token first, then gas.' },
+    diff: 2,
+    coins: ['btc','eth','sol','bnb','trx','usdt_trc20'],
+    mnemonic: ["abandon","ability","able","about","above","absent","absorb","abstract","absurd","abuse","access","accident"],
+  },
+  {
+    id: 3,
+    nl: { title: 'Expert', desc: 'TRX en USDT, plus een tweede "gas-free" account met USDT. Overschrijf van alle accounts naar de OM-Wallet.' },
+    en: { title: 'Expert',   desc: 'TRX and USDT, plus a second "gas-free" account with USDT. Transfer from all accounts to the OM-Wallet.' },
+    diff: 3,
+    coins: ['trx','usdt_trc20'],
+    hasGasFreeAccount: true,
+    mnemonic: ["abandon","ability","able","about","above","absent","absorb","abstract","absurd","abuse","access","accident"],
+  },
+];
+
+let activeScenario = SCENARIOS[0]; // standaard: basis
+let selectedScenarioId = 1;
+
+function renderScenarioGrid() {
+  const diff_labels = { nl: ['Basis','Gevorderd','Expert'], en: ['Basic','Advanced','Expert'] };
+  const diff_class  = ['diff-1','diff-2','diff-3'];
+  const coinColors = { btc:'#f7931a',eth:'#627eea',sol:'#9945ff',bnb:'#f3ba2f',trx:'#ff0013',usdt_trc20:'#26a17b' };
+  const coinLabels = { btc:'BTC',eth:'ETH',sol:'SOL',bnb:'BNB',trx:'TRX',usdt_trc20:'USDT' };
+  const specialCoins = ['trx','usdt_trc20'];
+
+  document.getElementById('scenario-grid').innerHTML = SCENARIOS.map(sc => {
+    const info = sc[currentLang] || sc.nl;
+    let coinIds = [...sc.coins];
+    if (sc.hasGasFreeAccount) coinIds.push('gasfree_usdt');
+    const coins = coinIds.map(id => {
+      const hi = specialCoins.includes(id) || id === 'gasfree_usdt' ? ' highlight' : '';
+      const lbl = id === 'gasfree_usdt' ? 'GF-USDT' : coinLabels[id];
+      return `<span class="scenario-coin${hi}">${lbl}</span>`;
+    }).join('');
+    const sel = sc.id === selectedScenarioId ? ' selected' : '';
+    return `<div class="scenario-item${sel}" onclick="selectScenario(${sc.id})">
+      <div class="scenario-num">${sc.id}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div class="scenario-title">${info.title}</div>
+          <span class="scenario-diff ${diff_class[sc.diff-1]}">${diff_labels[currentLang][sc.diff-1]}</span>
+        </div>
+        <div class="scenario-desc">${info.desc}</div>
+        <div class="scenario-coins">${coins}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectScenario(id) {
+  selectedScenarioId = id;
+  renderScenarioGrid();
+}
+
+function startScenario() {
+  activeScenario = SCENARIOS.find(s => s.id === selectedScenarioId) || SCENARIOS[1];
+
+  // Filter COINS to only scenario coins (these get real balances)
+  const activeCoinIds = activeScenario.coins;
+  window._scenarioCoins = COINS.filter(c => activeCoinIds.includes(c.id));
+
+  // Zero-balance extra coins (visible but always 0)
+  const zeroCoinIds = activeScenario.zeroBalanceCoins || [];
+  window._scenarioZeroCoins = COINS.filter(c => zeroCoinIds.includes(c.id));
+
+  document.getElementById('scenario-overlay').classList.remove('open');
+  beginOpdracht();
+}
+
+// ══════════════════════════════════════════════════════════
+//  THEORIE NAVIGATIE
+// ══════════════════════════════════════════════════════════
+
+let theorieTab = 0;
+const THEORIE_TABS = 3;
+
+function naarTheorie() {
+  // Sluit opdracht overlay, open theorie
+  const ov = document.getElementById('opdracht-overlay');
+  ov.style.transition = 'opacity .3s ease';
+  ov.style.opacity = '0';
+  setTimeout(() => {
+    ov.style.display = 'none';
+    theorieTab = 0;
+    naarTheorieTab(0);
+    document.getElementById('theorie-overlay').classList.add('open');
+  }, 300);
+}
+
+function naarTheorieTab(idx) {
+  theorieTab = idx;
+  for (let i = 0; i < THEORIE_TABS; i++) {
+    document.getElementById('tp' + i)?.classList.toggle('active', i === idx);
+    document.getElementById('tt' + i)?.classList.toggle('active', i === idx);
+    document.getElementById('td' + i)?.classList.toggle('active', i === idx);
+  }
+  document.getElementById('theorie-step-label').textContent = `${idx+1} / ${THEORIE_TABS}`;
+  document.getElementById('theorie-prev').style.display = idx === 0 ? 'none' : '';
+  const nextBtn = document.getElementById('theorie-next');
+  if (idx === THEORIE_TABS - 1) {
+    nextBtn.setAttribute('data-i18n', 'th_start');
+    nextBtn.textContent = t('th_start');
+  } else {
+    nextBtn.setAttribute('data-i18n', 'th_next');
+    nextBtn.textContent = t('th_next');
+  }
+}
+
+function theorieVolgende() {
+  if (theorieTab < THEORIE_TABS - 1) {
+    naarTheorieTab(theorieTab + 1);
+  } else {
+    // Laatste tab — naar scenario keuze
+    document.getElementById('theorie-overlay').classList.remove('open');
+    renderScenarioGrid();
+    document.getElementById('scenario-overlay').classList.add('open');
+  }
+}
+
+function theorieVorige() {
+  if (theorieTab > 0) naarTheorieTab(theorieTab - 1);
+}
+
+// ══════════════════════════════════════════════════════════
+//  VOORTGANGSBALK & TIJDREGISTRATIE
+// ══════════════════════════════════════════════════════════
+
+let startTijd = null;
+let tijdInterval = null;
+let pogingen = []; // { tijd, fout: bool, foutType: string }
+
+function startTijdmeting() {
+  startTijd = Date.now();
+  clearInterval(tijdInterval);
+  tijdInterval = setInterval(updateVoortgangTijd, 1000);
+}
+
+function stopTijdmeting() {
+  clearInterval(tijdInterval);
+  tijdInterval = null;
+}
+
+function updateVoortgangTijd() {
+  if (!startTijd) return;
+  const secs = Math.floor((Date.now() - startTijd) / 1000);
+  const m = String(Math.floor(secs / 60)).padStart(2,'0');
+  const s = String(secs % 60).padStart(2,'0');
+  const el = document.getElementById('voortgang-tijd');
+  if (el) el.textContent = `${m}:${s}`;
+}
+
+function getElapsedStr() {
+  if (!startTijd) return '—';
+  const secs = Math.floor((Date.now() - startTijd) / 1000);
+  const m = String(Math.floor(secs / 60)).padStart(2,'0');
+  const s = String(secs % 60).padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+function initVoortgang() {
+  const bar = document.getElementById('voortgang-bar');
+  const coinsEl = document.getElementById('voortgang-coins');
+  if (!bar || !coinsEl) return;
+  const scenarioCoins = window._scenarioCoins || COINS;
+  coinsEl.innerHTML = scenarioCoins.map(c =>
+    `<span class="vcoin pending" id="vcp-${c.id}">${c.ticker}</span>`
+  ).join('');
+  bar.classList.add('visible');
+  document.getElementById('voortgang-tijd').textContent = '00:00';
+  startTijdmeting();
+}
+
+function updateVoortgangCoin(coinId) {
+  const el = document.getElementById('vcp-' + coinId);
+  if (!el) return;
+  el.classList.remove('pending');
+  el.classList.add('done','just-done');
+  setTimeout(() => el.classList.remove('just-done'), 500);
+}
+
+function hideVoortgang() {
+  document.getElementById('voortgang-bar')?.classList.remove('visible');
+  stopTijdmeting();
+}
+
+// Render logboek in success modal
+function renderLogboek() {
+  if (!pogingen.length) return;
+  const block = document.getElementById('logboek-block');
+  const rows  = document.getElementById('logboek-rows');
+  if (!block || !rows) return;
+  const nl = currentLang === 'nl';
+  rows.innerHTML = pogingen.map((p,i) => {
+    const statusTxt = p.fout
+      ? (nl ? `❌ Fout (${p.foutType})` : `❌ Error (${p.foutType})`)
+      : (nl ? '✅ Geslaagd' : '✅ Completed');
+    const statusCls = p.fout ? 'fout' : '';
+    return `<div class="logboek-row">
+      <span class="logboek-poging">${nl ? 'Poging' : 'Attempt'} ${i+1}</span>
+      <span class="logboek-tijd">⏱ ${p.tijd}</span>
+      <span class="logboek-status ${statusCls}">${statusTxt}</span>
+    </div>`;
+  }).join('');
+  block.style.display = 'block';
+}
+
+// ══════════════════════════════════════════════════════════
+//  PATCH beginOpdracht — init voortgang + tijd
+// ══════════════════════════════════════════════════════════
+
+const _beginOpdrachtBase = beginOpdracht;
+beginOpdracht = function() {
+  _beginOpdrachtBase();
+  // Apply scenario coin filter to CV wallet (cvInit already handles zero-balance coins)
+  if (window._scenarioCoins) {
+    if (cvState && cvState.addr) {
+      // OM only tracks active (non-zero) coins
+      omState.coins = window._scenarioCoins.map(c => ({...c, balance:0}));
+      cvRenderPortfolio(); cvRenderCoins(); cvRenderTxs(); populateSendSelect();
+      omRenderPortfolio(); omRenderCoins(); omRenderAddresses();
+    }
+  }
+  initVoortgang();
+};
+
+// ══════════════════════════════════════════════════════════
+//  PATCH deliverToOM — update voortgang coin
+// ══════════════════════════════════════════════════════════
+const _origDeliverToOM = deliverToOM;
+deliverToOM = function(coinId, ticker, amount) {
+  _origDeliverToOM(coinId, ticker, amount);
+  updateVoortgangCoin(coinId);
+  // Also mark USDT when TRX is the gas coin for it
+  if (coinId === 'usdt_trc20') updateVoortgangCoin('usdt_trc20');
+
+  // Expert scenario: hint gas-free tab als main account leeg is
+  if (gasFreeState.active && gasFreeState.balance > 0) {
+    const scenarioCoinIds = window._scenarioCoins ? window._scenarioCoins.map(c => c.id) : [];
+    const mainCoins = cvState ? cvState.coins.filter(c => scenarioCoinIds.includes(c.id)) : [];
+    const mainEmpty = mainCoins.every(c => c.balance < 0.001);
+    if (mainEmpty && activeAccount === 'main') {
+      startHint('gasfree_tab', 10000, () => {
+        // Controleer opnieuw: nog steeds op main en gas-free nog niet leeg
+        if (activeAccount !== 'main' || gasFreeState.balance <= 0) return;
+        const btn = document.querySelector('#account-switcher .acc-btn:last-child');
+        if (btn) {
+          btn.classList.add('hint-pulse');
+          btn.addEventListener('click', () => btn.classList.remove('hint-pulse'), { once: true });
+        }
+      });
+    }
+  }
+};
+
+// ══════════════════════════════════════════════════════════
+//  PATCH checkMissionComplete — log pogingen
+// ══════════════════════════════════════════════════════════
+const _origCheckMission = checkMissionComplete;
+checkMissionComplete = function() {
+  _origCheckMission();
+  // Check if a modal just opened — log the attempt
+  const successOpen = document.getElementById('successModal').classList.contains('open');
+  const failureOpen = document.getElementById('failureModal').classList.contains('open');
+  if (successOpen || failureOpen) {
+    const foutType = failureOpen ? detectFoutType() : '';
+    pogingen.push({ tijd: getElapsedStr(), fout: failureOpen, foutType });
+    stopTijdmeting();
+    if (successOpen) {
+      hideVoortgang();
+      renderLogboek();
+    }
+  }
+};
+
+function detectFoutType() {
+  const detail = document.getElementById('failure-detail')?.textContent || '';
+  if (detail.includes('TRX') && detail.includes('USDT')) return currentLang === 'nl' ? 'TRX vóór USDT' : 'TRX before USDT';
+  return currentLang === 'nl' ? 'resterend saldo' : 'remaining balance';
+}
+
+// ══════════════════════════════════════════════════════════
+//  PATCH herlaadOpdracht — reset logboek state + voortgang
+// ══════════════════════════════════════════════════════════
+const _herlaadBase = herlaadOpdracht;
+herlaadOpdracht = function() {
+  toonSucces(); // reset learn view
+  pogingen = [];
+  hideVoortgang();
+  startTijd = null;
+  _herlaadBase();
+  // Go back to scenario chooser instead of opdracht overlay
+  setTimeout(() => {
+    document.getElementById('opdracht-overlay').style.display = 'none';
+    renderScenarioGrid();
+    document.getElementById('scenario-overlay').classList.add('open');
+  }, 450);
+};
+
+// PATCH herstelFout — herstart tijdmeting, herinit voortgang voor resterende coins
+const _herstelBase = herstelFout;
+herstelFout = function() {
+  _herstelBase();
+  pogingen.push({ tijd: getElapsedStr(), fout: true, foutType: currentLang === 'nl' ? 'TRX vóór USDT' : 'TRX before USDT' });
+  // Update voortgang: keep done coins done, restart timer
+  if (window._scenarioCoins) {
+    window._scenarioCoins.forEach(c => {
+      const omCoin = omState.coins.find(o => o.id === c.id);
+      if (omCoin && omCoin.balance > 0) {
+        const el = document.getElementById('vcp-' + c.id);
+        if (el) { el.classList.remove('pending'); el.classList.add('done'); }
+      }
+    });
+  }
+  startTijdmeting(); // herstart timer voor nieuwe poging
+};
+
+// ══════════════════════════════════════════════════════════
+//  TRANSLATIONS for new keys
+// ══════════════════════════════════════════════════════════
+// Inject into existing TRANSLATIONS object at runtime
+const newTransNL = {
+  th_tab0:'Wallets & Mnemonics', th_tab1:'Coins & Tokens', th_tab2:'Gas & Volgorde',
+  th_prev:'← Vorige', th_next:'Volgende →', th_start:'Kies een scenario →',
+  th0_h:'Wat is een crypto wallet?', th1_h:'Native coins vs. tokens', th2_h:'Gas fees & de juiste volgorde',
+  th0_b:`Een crypto wallet slaat geen munten op — het beheert je <strong>privésleutel</strong>. Met die sleutel kun je transacties ondertekenen en aantonen dat de crypto van jou is.<br><br>Een <strong>mnemonic</strong> (ook wel <em>seed phrase</em>) is een reeks van 12 of 24 gewone woorden die jouw privésleutel vertegenwoordigt. Wie deze woorden kent, heeft volledige toegang tot de wallet.<br><br>Via de standaard <span class="tag">BIP-39</span> → <span class="tag">BIP-44</span> afleiding worden uit de mnemonic altijd dezelfde adressen gegenereerd — op elk apparaat, in elke wallet-app.`,
+  th0_tip:`<strong style="color:#dce8f5">Bij inbeslagneming:</strong> een gevonden mnemonic geeft directe toegang tot alle tegoeden. Het is cruciaal deze veilig te noteren en zo snel mogelijk over te maken naar een gecustodied adres.`,
+  th1_b:`Een <strong>native coin</strong> is de oorspronkelijke munt van een blockchain. Voorbeelden: <span class="tag">ETH</span> op Ethereum, <span class="tag">TRX</span> op Tron, <span class="tag">BNB</span> op BNB Chain.<br><br>Een <strong>token</strong> is een digitaal tegoed dat <em>bovenop</em> een bestaande blockchain draait. Voorbeeld: <span class="tag">USDT (TRC-20)</span> draait op de Tron blockchain.<br><br>Het cruciale verschil: tokens hebben de native coin van hun blockchain nodig om te kunnen worden verstuurd. Zonder <span class="tag">TRX</span> kun je geen <span class="tag">USDT (TRC-20)</span> versturen — ook al heb je genoeg USDT.`,
+  th1_tip:`<strong style="color:var(--cv-warn)">Valkuil:</strong> TRX eerst versturen en daarna USDT proberen → de USDT zit vast. Er is geen gas meer om de transactie te betalen.`,
+  th2_b:`Elke transactie op een blockchain kost een kleine <strong>gas fee</strong>. Deze fee wordt altijd betaald in de native coin van die blockchain — ook als je een token verstuurt.<br><br>De juiste volgorde bij inbeslagneming met tokens:`,
+  th2_step1:`Verstuur eerst de <span class="tag">tokens</span> (bijv. USDT)`,
+  th2_step2:`Verstuur daarna de <span class="tag">native coin</span> (bijv. TRX)`,
+  th2_step3:`Gebruik de <span class="tag">MAX knop</span> om niets achter te laten`,
+  th2_tip:`<strong style="color:var(--cv-accent)">Tip:</strong> de volgorde van BTC, ETH, SOL en BNB maakt niet uit — dat zijn allemaal native coins zonder token-afhankelijkheid.`,
+  sc_badge:'🎯 Kies een scenario', sc_title:'Welk scenario wil je oefenen?',
+  sc_desc:'Elk scenario heeft dezelfde mnemonic maar een andere coins-mix en moeilijkheidsgraad.',
+  sc_start:'Start oefening →',
+  vb_label:'Voortgang',
+  logboek_title:'📋 Pogingen',
+  opdracht_start_btn:'Begin met de opdracht →',
+  // Expert leermomenten
+  learn_expert_title:'Meerdere accounts & Gas-Free',
+  learn_expert_q1:'Waarom kan een wallet meerdere accounts bevatten?',
+  learn_expert_a1:'Eén seed phrase (mnemonic) kan meerdere accounts genereren. Elk account heeft een eigen adres en eigen saldo, maar ze zijn allemaal afgeleid van dezelfde 12 woorden. Bij een inbeslagneming is het daarom belangrijk om niet alleen het hoofdaccount te controleren, maar ook eventuele extra accounts — al het tegoed valt onder dezelfde mnemonic.',
+  learn_expert_q2:'Wat is een Gas-Free account?',
+  learn_expert_a2:'Normaal gesproken heb je bij elke transactie op het Tron-netwerk een kleine hoeveelheid TRX nodig om de transactiekosten (gas) te betalen. Een Gas-Free account omzeilt dit: de transactiekosten worden niet in TRX afgerekend, maar als een vast bedrag in USDT ingehouden — in dit geval altijd <strong style="color:var(--cv-text)">1 USDT</strong> per transactie, verzonden naar de Tron GasFree Wallet Activator.<br><br>Dit klinkt eenvoudiger, maar het betekent ook dat je het volledige USDT-saldo nooit volledig kunt overmaken: er blijft altijd 1 USDT achter als transactiekost. Gebruik daarom ook hier de MAX-knop, die dit automatisch berekent.<br><br><span style="color:rgba(255,180,150,.9)">⚠️ Gas-Free accounts worden op dit moment slechts door enkele wallets ondersteund, waaronder TronLink en bepaalde versies van Trust Wallet. Niet elke wallet biedt deze optie aan.</span>',
+  // Gas-free dashboard
+  gf_account_addr:'Account adres',
+  gf_info_box:'Dit is een <strong style="color:var(--cv-text)">gas-free account</strong>. Je betaalt geen TRX als gas, maar er wordt altijd <strong style="color:var(--cv-warn)">1 USDT transactiekost</strong> ingehouden die naar de <strong>Tron GasFree Wallet Activator</strong> gaat.',
+  gf_send_btn:'Verstuur naar OM-Wallet',
+  gf_txs_lbl:'Transacties',
+  gf_main_lbl:'Hoofdaccount',
+  // Gas-free send modal
+  gf_modal_title:'Verstuur USDT (Gas-Free)',
+  gf_notice:'Gas-free transactie: geen TRX nodig. De activatiekosten van <strong style="color:var(--cv-warn)">1 USDT</strong> worden automatisch ingehouden en verzonden naar de <strong>Tron GasFree Wallet Activator</strong>.',
+  gf_fee_label:'Transactiekosten:',
+  gf_addr_label:'Ontvangstadres (OM-Wallet)',
+  gf_addr_lbl2:'Adres:',
+  gf_amount_label:'Bedrag (USDT)',
+  gf_avail:'Beschikbaar',
+  gf_after_fee:'Na fee',
+  gf_recv_lbl:'Te ontvangen',
+  gf_fee_lbl:'Transactiekosten',
+  gf_total_lbl:'Totaal van account',
+  gf_cancel:'Annuleren',
+  gf_sign_send:'Onderteken & Verstuur',
+  gf_addr_ok:'OM-Wallet Tron adres herkend',
+  gf_addr_unknown:'Onbekend adres',
+  gf_bal_low:'Saldo te laag',
+  gf_enter_addr:'Voer een adres in',
+  gf_invalid_addr:'Ongeldig adres',
+  gf_enter_amt:'Voer een geldig bedrag in',
+  gf_insuf_bal:'Onvoldoende saldo (incl. 1 USDT fee)',
+  gf_sent_toast:'verstuurd — wacht op bevestiging…',
+  gf_recv_toast:'ontving',
+  gf_forgot_toast:'Vergeet het gas-free account niet!',
+  gf_recv_from:'Ontvangen van Gas-Free Account',
+};
+const newTransEN = {
+  th_tab0:'Wallets & Mnemonics', th_tab1:'Coins & Tokens', th_tab2:'Gas & Order',
+  th_prev:'← Previous', th_next:'Next →', th_start:'Choose a scenario →',
+  th0_h:'What is a crypto wallet?', th1_h:'Native coins vs. tokens', th2_h:'Gas fees & the correct order',
+  th0_b:`A crypto wallet does not store coins — it manages your <strong>private key</strong>. With that key you can sign transactions and prove that the crypto belongs to you.<br><br>A <strong>mnemonic</strong> (also called a <em>seed phrase</em>) is a sequence of 12 or 24 ordinary words that represents your private key. Anyone who knows these words has full access to the wallet.<br><br>Using the standard <span class="tag">BIP-39</span> → <span class="tag">BIP-44</span> derivation, the mnemonic always generates the same addresses — on any device, in any wallet app.`,
+  th0_tip:`<strong style="color:#dce8f5">During seizure:</strong> a found mnemonic gives immediate access to all funds. It is crucial to record it securely and transfer the funds to a custodial address as quickly as possible.`,
+  th1_b:`A <strong>native coin</strong> is the original currency of a blockchain. Examples: <span class="tag">ETH</span> on Ethereum, <span class="tag">TRX</span> on Tron, <span class="tag">BNB</span> on BNB Chain.<br><br>A <strong>token</strong> is a digital asset that runs <em>on top of</em> an existing blockchain. Example: <span class="tag">USDT (TRC-20)</span> runs on the Tron blockchain.<br><br>The crucial difference: tokens need the native coin of their blockchain to be sent. Without <span class="tag">TRX</span> you cannot send <span class="tag">USDT (TRC-20)</span> — even if you have enough USDT.`,
+  th1_tip:`<strong style="color:var(--cv-warn)">Pitfall:</strong> sending TRX first and then trying to send USDT → the USDT gets stuck. There is no gas left to pay for the transaction.`,
+  th2_b:`Every transaction on a blockchain costs a small <strong>gas fee</strong>. This fee is always paid in the native coin of that blockchain — even when sending a token.<br><br>The correct order during seizure with tokens:`,
+  th2_step1:`Send the <span class="tag">tokens</span> first (e.g. USDT)`,
+  th2_step2:`Then send the <span class="tag">native coin</span> (e.g. TRX)`,
+  th2_step3:`Use the <span class="tag">MAX button</span> to leave nothing behind`,
+  th2_tip:`<strong style="color:var(--cv-accent)">Tip:</strong> the order of BTC, ETH, SOL and BNB does not matter — these are all native coins with no token dependency.`,
+  sc_badge:'🎯 Choose a scenario', sc_title:'Which scenario do you want to practise?',
+  sc_desc:'Each scenario uses the same mnemonic but a different coin mix and difficulty.',
+  sc_start:'Start exercise →',
+  vb_label:'Progress',
+  logboek_title:'📋 Attempts',
+  opdracht_start_btn:'Start the assignment →',
+  // Expert learn moments
+  learn_expert_title:'Multiple accounts & Gas-Free',
+  learn_expert_q1:'Why can a wallet contain multiple accounts?',
+  learn_expert_a1:'One seed phrase (mnemonic) can generate multiple accounts. Each account has its own address and balance, but they are all derived from the same 12 words. During a seizure it is therefore important to check not only the main account but also any additional accounts — all funds fall under the same mnemonic.',
+  learn_expert_q2:'What is a Gas-Free account?',
+  learn_expert_a2:'Normally, every transaction on the Tron network requires a small amount of TRX to pay the transaction fee (gas). A Gas-Free account bypasses this: fees are not charged in TRX but deducted as a fixed amount in USDT — in this case always <strong style="color:var(--cv-text)">1 USDT</strong> per transaction, sent to the Tron GasFree Wallet Activator.<br><br>This sounds simpler, but it also means you can never transfer the full USDT balance: 1 USDT always remains as the transaction fee. Use the MAX button here too — it calculates this automatically.<br><br><span style="color:rgba(255,180,150,.9)">⚠️ Gas-Free accounts are currently only supported by a few wallets, including TronLink and certain versions of Trust Wallet. Not every wallet offers this option.</span>',
+  // Gas-free dashboard
+  gf_account_addr:'Account address',
+  gf_info_box:'This is a <strong style="color:var(--cv-text)">gas-free account</strong>. No TRX gas needed, but a fixed <strong style="color:var(--cv-warn)">1 USDT transaction fee</strong> is always deducted, sent to the <strong>Tron GasFree Wallet Activator</strong>.',
+  gf_send_btn:'Send to OM-Wallet',
+  gf_txs_lbl:'Transactions',
+  gf_main_lbl:'Main account',
+  // Gas-free send modal
+  gf_modal_title:'Send USDT (Gas-Free)',
+  gf_notice:'Gas-free transaction: no TRX required. An activation fee of <strong style="color:var(--cv-warn)">1 USDT</strong> is automatically deducted and sent to the <strong>Tron GasFree Wallet Activator</strong>.',
+  gf_fee_label:'Transaction fee:',
+  gf_addr_label:'Recipient address (OM-Wallet)',
+  gf_addr_lbl2:'Address:',
+  gf_amount_label:'Amount (USDT)',
+  gf_avail:'Available',
+  gf_after_fee:'After fee',
+  gf_recv_lbl:'You will receive',
+  gf_fee_lbl:'Transaction fee',
+  gf_total_lbl:'Total from account',
+  gf_cancel:'Cancel',
+  gf_sign_send:'Sign & Send',
+  gf_addr_ok:'OM-Wallet Tron address recognised',
+  gf_addr_unknown:'Unknown address',
+  gf_bal_low:'Balance too low',
+  gf_enter_addr:'Enter an address',
+  gf_invalid_addr:'Invalid address',
+  gf_enter_amt:'Enter a valid amount',
+  gf_insuf_bal:'Insufficient balance (incl. 1 USDT fee)',
+  gf_sent_toast:'sent — awaiting confirmation…',
+  gf_recv_toast:'received',
+  gf_forgot_toast:'Don\'t forget the gas-free account!',
+  gf_recv_from:'Received from Gas-Free Account',
+};
+Object.assign(TRANSLATIONS.nl, newTransNL);
+Object.assign(TRANSLATIONS.en, newTransEN);
+
+// ══════════════════════════════════════════════════════════
+//  GAS-FREE ACCOUNT SYSTEEM (alleen in Expert scenario)
+// ══════════════════════════════════════════════════════════
+
+// Gas-free account state
+const gasFreeState = {
+  active: false,
+  balance: 0,          // USDT balance op gas-free account
+  addr: 'TGasFree9xR2hWa3xNbCfY9jPkLd7sOM82',   // het gas-free adres (vast)
+  txs: []
+};
+
+const GASFREE_OM_ADDRESS = 'TOMWa11etTRXrPkLd7sR2hWa3xNbCfY9j'; // zelfde Tron OM-adres
+const GASFREE_ACTIVATOR_ADDR = 'TGasFreeActivator1XqN2vBdCfY8hGjLs9TRX';
+const GASFREE_FEE_USDT = 1.0;  // altijd 1 USDT
+
+// Genereer een willekeurig startbedrag voor het gas-free account
+function initGasFreeBalance() {
+  const base = 80 + Math.floor(Math.random() * 180); // 80–260 USDT
+  gasFreeState.balance = parseFloat(base.toFixed(2));
+  gasFreeState.txs = [];
+}
+
+// ── CSS voor gas-free UI ──
+(function injectGasFreeCSS() {
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Account switcher */
+    .account-switcher {
+      display: flex;
+      gap: 4px;
+      background: var(--cv-surf2);
+      border: 1px solid var(--cv-border);
+      border-radius: 8px;
+      padding: 3px;
+      margin-bottom: 14px;
+    }
+    .acc-btn {
+      flex: 1;
+      padding: 7px 6px;
+      border: none;
+      border-radius: 5px;
+      background: none;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--cv-muted);
+      transition: all .15s;
+      letter-spacing: .04em;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .acc-btn.active {
+      background: var(--cv-surf);
+      color: var(--cv-text);
+      box-shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+    .acc-btn .acc-badge {
+      display: block;
+      font-size: 8px;
+      margin-top: 2px;
+      opacity: .7;
+    }
+    .gasfree-badge {
+      display: inline-block;
+      background: rgba(0,229,160,.1);
+      border: 1px solid rgba(0,229,160,.25);
+      color: var(--cv-accent);
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+      letter-spacing: .06em;
+    }
+    /* Gas-free send modal override */
+    #gasfree-send-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #gasfree-send-modal.open { display: flex; }
+    .gasfree-modal-card {
+      background: #0f1319;
+      border: 1px solid #1e2535;
+      border-radius: 16px;
+      max-width: 420px;
+      width: 100%;
+      padding: 28px 28px 24px;
+      box-shadow: 0 0 60px rgba(0,229,160,.08), 0 24px 80px rgba(0,0,0,.8);
+    }
+    .gasfree-modal-title {
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--cv-text);
+      margin-bottom: 6px;
+    }
+    .gasfree-notice {
+      background: rgba(0,229,160,.07);
+      border: 1px solid rgba(0,229,160,.2);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: rgba(220,232,245,.7);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .gasfree-fee-row {
+      background: rgba(255,107,53,.07);
+      border: 1px solid rgba(255,107,53,.2);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: rgba(255,180,150,.9);
+      line-height: 1.6;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .gasfree-form-row {
+      margin-bottom: 12px;
+    }
+    .gasfree-form-lbl {
+      font-size: 10px;
+      letter-spacing: .12em;
+      color: var(--cv-muted);
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    .gasfree-input {
+      width: 100%;
+      background: var(--cv-surf2);
+      border: 1px solid var(--cv-border);
+      border-radius: 7px;
+      padding: 9px 12px;
+      color: var(--cv-text);
+      font-family: var(--mono);
+      font-size: 12px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .gasfree-input:focus { border-color: var(--cv-accent); }
+    .gasfree-avail {
+      font-size: 10px;
+      color: var(--cv-muted);
+      margin-top: 4px;
+    }
+    .gasfree-summary {
+      background: var(--cv-surf2);
+      border: 1px solid var(--cv-border);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: var(--cv-muted);
+      line-height: 1.8;
+      margin-bottom: 14px;
+    }
+    .gasfree-summary strong { color: var(--cv-text); }
+    .gasfree-btns { display: flex; gap: 8px; }
+    .gasfree-btn-cancel {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid var(--cv-border);
+      border-radius: 7px;
+      color: var(--cv-muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .gasfree-btn-cancel:hover { border-color: var(--cv-accent); color: var(--cv-text); }
+    .gasfree-btn-send {
+      flex: 2;
+      padding: 10px;
+      background: var(--cv-accent);
+      border: none;
+      border-radius: 7px;
+      color: #000;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter .15s;
+    }
+    .gasfree-btn-send:hover { filter: brightness(1.1); }
+    .gasfree-dashboard {
+      padding: 0;
+    }
+    .gasfree-addr-bar {
+      background: var(--cv-surf2);
+      border: 1px solid var(--cv-border);
+      border-radius: 7px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .gasfree-addr-text {
+      font-size: 10px;
+      color: var(--cv-muted);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+// ── Gas-free account dashboard rendering ──
+function renderGasFreeDashboard() {
+  const screen = document.getElementById('cv-dash');
+  if (!screen) return;
+
+  // Vervang het normale CV-dashboard tijdelijk met gas-free weergave
+  // We inject een extra div in de screen als die nog niet bestaat
+  let gfd = document.getElementById('gasfree-dash-content');
+  let cvNormal = document.getElementById('cv-normal-content');
+
+  if (!gfd) {
+    // Wrap existing dash content
+    const dashPanel = screen.parentElement;
+
+    // Maak een container voor normale inhoud als nog niet gedaan
+    cvNormal = document.createElement('div');
+    cvNormal.id = 'cv-normal-content';
+    // Move all children of .cv (dashboard) into cvNormal
+    const cvDiv = screen.closest('.cv');
+    // We'll just insert gfd as a sibling of cv-normal-content
+    gfd = document.createElement('div');
+    gfd.id = 'gasfree-dash-content';
+    gfd.style.display = 'none';
+    screen.appendChild(gfd);
+  }
+
+  const maxSend = parseFloat((gasFreeState.balance - GASFREE_FEE_USDT).toFixed(2));
+  gfd.innerHTML = `
+    <div class="gasfree-dashboard">
+      <div class="card">
+        <div class="card-lbl">GAS-FREE ACCOUNT · USDT (TRC-20)</div>
+        <div class="total" style="color:var(--cv-accent)">${gasFreeState.balance.toFixed(2)} <span style="font-size:16px;color:var(--cv-muted)">USDT</span></div>
+        <div style="font-size:11px;color:var(--cv-muted);margin-top:4px;margin-bottom:16px">≈ €${gasFreeState.balance.toFixed(2)}</div>
+        <div class="gasfree-addr-bar">
+          <div>
+            <div style="font-size:9px;letter-spacing:.1em;color:var(--cv-muted);text-transform:uppercase;margin-bottom:2px">${t('gf_account_addr')}</div>
+            <div class="gasfree-addr-text">${gasFreeState.addr}</div>
+          </div>
+        </div>
+        <div class="warn-box">
+          <span>ℹ️</span>
+          <span>${t('gf_info_box')}</span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div class="ci" style="background:rgba(38,161,123,.12);color:#26a17b;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">$</div>
+          <div style="flex:1">
+            <div style="font-family:var(--display);font-size:13px;font-weight:500">USDT <span style="font-size:9px;background:rgba(38,161,123,.12);border:1px solid rgba(38,161,123,.25);color:#26a17b;padding:1px 5px;border-radius:3px">TRC-20</span></div>
+            <div style="font-size:10px;color:var(--cv-muted)">Stablecoin · gas-free</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px">${gasFreeState.balance.toFixed(2)} USDT</div>
+            <div style="font-size:11px;color:var(--cv-muted)">€${gasFreeState.balance.toFixed(2)}</div>
+          </div>
+        </div>
+        <button onclick="openGasFreeSend()" style="width:100%;padding:9px;background:var(--cv-accent);border:none;border-radius:7px;color:#000;font-family:var(--mono);font-size:12px;font-weight:600;cursor:pointer;margin-top:4px;transition:filter .15s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">
+          ↑ ${t('gf_send_btn')}
+        </button>
+      </div>
+
+      ${gasFreeState.txs.length > 0 ? `
+      <div class="card" style="padding:12px">
+        <div style="font-size:10px;letter-spacing:.12em;color:var(--cv-muted);text-transform:uppercase;margin-bottom:8px">${t('gf_txs_lbl')}</div>
+        ${gasFreeState.txs.map(tx => `
+          <div class="tx-row">
+            <div class="txi send">↑</div>
+            <div class="tx-info">
+              <div class="tx-desc">${tx.desc}</div>
+              <div class="tx-date">${tx.date} · ${tx.hash}</div>
+            </div>
+            <div class="tx-amt send">-${tx.amount} USDT</div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </div>
+  `;
+}
+
+// ── Toon/verberg gas-free vs normaal dashboard ──
+let activeAccount = 'main'; // 'main' of 'gasfree'
+
+function switchAccount(which) {
+  activeAccount = which;
+  // Annuleer de gas-free hint timer als de gebruiker zelf switcht
+  clearHint('gasfree_tab');
+  const switcher = document.getElementById('account-switcher');
+  if (!switcher) return;
+  switcher.querySelectorAll('.acc-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && which === 'main') || (i === 1 && which === 'gasfree'));
+  });
+
+  // Toon juiste inhoud
+  const normalContent = document.getElementById('cv-normal-dash');
+  const gasfreeContent = document.getElementById('gasfree-dash-content');
+  if (normalContent) normalContent.style.display = which === 'main' ? '' : 'none';
+  if (gasfreeContent) {
+    gasfreeContent.style.display = which === 'gasfree' ? '' : 'none';
+    if (which === 'gasfree') renderGasFreeDashboard();
+  }
+}
+
+// ── Injecteer account-switcher in cv-dash ──
+function injectAccountSwitcher() {
+  const dash = document.getElementById('cv-dash');
+  if (!dash || document.getElementById('account-switcher')) return;
+
+  // Wrap bestaande inhoud in #cv-normal-dash
+  const normalWrap = document.createElement('div');
+  normalWrap.id = 'cv-normal-dash';
+  while (dash.firstChild) normalWrap.appendChild(dash.firstChild);
+  dash.appendChild(normalWrap);
+
+  // Gas-free content container
+  const gfd = document.createElement('div');
+  gfd.id = 'gasfree-dash-content';
+  gfd.style.display = 'none';
+  dash.appendChild(gfd);
+
+  // Switcher bovenaan invoegen
+  const switcherHTML = `<div class="account-switcher" id="account-switcher">
+    <button class="acc-btn active" onclick="switchAccount('main')">
+      CryptoVault
+      <span class="acc-badge">${t('gf_main_lbl')}</span>
+    </button>
+    <button class="acc-btn" onclick="switchAccount('gasfree')">
+      Gas-Free <span class="gasfree-badge">GF</span>
+      <span class="acc-badge">USDT · Tron</span>
+    </button>
+  </div>`;
+
+  dash.insertAdjacentHTML('afterbegin', switcherHTML);
+}
+
+// ── Gas-free send modal ──
+function openGasFreeSend() {
+  const maxSend = parseFloat((gasFreeState.balance - GASFREE_FEE_USDT).toFixed(2));
+
+  let modal = document.getElementById('gasfree-send-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'gasfree-send-modal';
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div class="gasfree-modal-card">
+      <div class="gasfree-modal-title">↑ ${t('gf_modal_title')}</div>
+      <div style="font-size:10px;color:var(--cv-muted);margin-bottom:14px;letter-spacing:.08em">GAS-FREE ACCOUNT → OM-WALLET</div>
+
+      <div class="gasfree-notice">
+        ⚡ ${t('gf_notice')}
+      </div>
+
+      <div class="gasfree-fee-row">
+        <span>⚠️</span>
+        <span>${t('gf_fee_label')} <strong>1 USDT</strong> → Tron GasFree Wallet Activator<br>${t('gf_addr_lbl2')} <span style="font-size:9px;opacity:.7">${GASFREE_ACTIVATOR_ADDR}</span></span>
+      </div>
+
+      <div class="gasfree-form-row">
+        <div class="gasfree-form-lbl">${t('gf_addr_label')}</div>
+        <input class="gasfree-input" id="gf-addr" placeholder="${GASFREE_OM_ADDRESS}" value="" oninput="validateGasFreeAddr()"/>
+        <div id="gf-addr-feedback" style="font-size:10px;margin-top:4px;height:16px"></div>
+      </div>
+
+      <div class="gasfree-form-row">
+        <div class="gasfree-form-lbl">${t('gf_amount_label')}</div>
+        <div style="display:flex;gap:6px">
+          <input class="gasfree-input" id="gf-amount" type="number" step="0.01" min="0" placeholder="0.00" oninput="updateGasFreePreview()" style="flex:1"/>
+          <button onclick="fillGasFreeMax()" style="padding:9px 12px;background:var(--cv-surf2);border:1px solid var(--cv-border);border-radius:7px;color:var(--cv-accent);font-family:var(--mono);font-size:11px;cursor:pointer;white-space:nowrap;transition:all .15s" onmouseover="this.style.borderColor='var(--cv-accent)'" onmouseout="this.style.borderColor='var(--cv-border)'">MAX</button>
+        </div>
+        <div class="gasfree-avail">${t('gf_avail')}: ${gasFreeState.balance.toFixed(2)} USDT · ${t('gf_after_fee')}: max ${maxSend > 0 ? maxSend.toFixed(2) : '0.00'} USDT</div>
+      </div>
+
+      <div class="gasfree-summary" id="gf-summary">
+        <div>${t('gf_recv_lbl')}: <strong id="gf-recv">—</strong></div>
+        <div>${t('gf_fee_lbl')}: <strong style="color:var(--cv-warn)">1.00 USDT → GasFree Activator</strong></div>
+        <div>${t('gf_total_lbl')}: <strong id="gf-total">—</strong></div>
+      </div>
+
+      <div class="gasfree-btns">
+        <button class="gasfree-btn-cancel" onclick="closeGasFreeSend()">${t('gf_cancel')}</button>
+        <button class="gasfree-btn-send" onclick="executeGasFreeSend()">🔏 ${t('gf_sign_send')}</button>
+      </div>
+    </div>
+  `;
+  modal.classList.add('open');
+}
+
+function closeGasFreeSend() {
+  const modal = document.getElementById('gasfree-send-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function fillGasFreeMax() {
+  const max = parseFloat((gasFreeState.balance - GASFREE_FEE_USDT).toFixed(2));
+  if (max <= 0) { showToast('⚠️ ' + t('gf_bal_low')); return; }
+  document.getElementById('gf-amount').value = max;
+  updateGasFreePreview();
+}
+
+function validateGasFreeAddr() {
+  const val = document.getElementById('gf-addr').value.trim();
+  const fb = document.getElementById('gf-addr-feedback');
+  if (!val) { fb.textContent = ''; return false; }
+  if (val === GASFREE_OM_ADDRESS) {
+    fb.innerHTML = `<span style="color:var(--cv-accent)">✓ ${t('gf_addr_ok')}</span>`;
+    return true;
+  }
+  fb.innerHTML = `<span style="color:var(--cv-warn)">✗ ${t('gf_addr_unknown')}</span>`;
+  return false;
+}
+
+function updateGasFreePreview() {
+  const amt = parseFloat(document.getElementById('gf-amount').value) || 0;
+  const recv = document.getElementById('gf-recv');
+  const total = document.getElementById('gf-total');
+  if (recv) recv.textContent = amt > 0 ? `${(amt).toFixed(2)} USDT` : '—';
+  if (total) total.textContent = amt > 0 ? `${(amt + GASFREE_FEE_USDT).toFixed(2)} USDT` : '—';
+}
+
+function executeGasFreeSend() {
+  const addr = document.getElementById('gf-addr').value.trim();
+  const amt = parseFloat(document.getElementById('gf-amount').value);
+
+  if (!addr) { showToast('⚠️ ' + t('gf_enter_addr')); return; }
+  if (!validateGasFreeAddr()) { showToast('⚠️ ' + t('gf_invalid_addr')); return; }
+  if (!amt || amt <= 0) { showToast('⚠️ ' + t('gf_enter_amt')); return; }
+  if (amt + GASFREE_FEE_USDT > gasFreeState.balance + 1e-9) {
+    showToast('⚠️ ' + t('gf_insuf_bal'));
+    return;
+  }
+
+  // Verwerk de transactie
+  const totalDeducted = parseFloat((amt + GASFREE_FEE_USDT).toFixed(2));
+  gasFreeState.balance = parseFloat((gasFreeState.balance - totalDeducted).toFixed(2));
+
+  gasFreeState.txs.unshift({
+    type: 'send',
+    desc: `→ OM-Wallet (${addr.slice(0,12)}…) · fee: 1 USDT → GasFree Activator`,
+    amount: amt,
+    date: fmtDate(Date.now()),
+    hash: rHash()
+  });
+
+  closeGasFreeSend();
+  showToast(`↑ ${amt} USDT ${t('gf_sent_toast')}`);
+
+  // Lever na 5 sec af op OM
+  setTimeout(() => deliverGasFreeToOM(amt), 5000);
+}
+
+function deliverGasFreeToOM(amount) {
+  // Crediteer USDT op OM-wallet
+  const omCoin = omState.coins.find(c => c.id === 'usdt_trc20');
+  if (omCoin) omCoin.balance = parseFloat((omCoin.balance + amount).toFixed(8));
+
+  omState.txs.unshift({
+    type: 'recv',
+    desc: t('gf_recv_from'),
+    coin: 'USDT',
+    amount,
+    date: fmtDate(Date.now()),
+    hash: rHash()
+  });
+
+  omRenderPortfolio();
+  omRenderCoins();
+  omRenderTxs(true);
+  document.getElementById('om-tx-badge').style.display = 'inline-block';
+  omTab('txs');
+
+  showToast(`✅ OM-Wallet ${t('gf_recv_toast')} ${amount} USDT`);
+
+  // Update voortgang bar voor gasfree usdt
+  updateVoortgangCoin('gasfree_usdt');
+
+  // Herrender gas-free dashboard
+  renderGasFreeDashboard();
+
+  // Check missie
+  setTimeout(checkMissionComplete, 400);
+}
+
+// ── Patch startScenario om gas-free account te activeren ──
+const _origStartScenario = startScenario;
+startScenario = function() {
+  _origStartScenario();
+
+  const sc = SCENARIOS.find(s => s.id === selectedScenarioId);
+  if (sc && sc.hasGasFreeAccount) {
+    gasFreeState.active = true;
+    activeAccount = 'main';
+    initGasFreeBalance();
+
+    // Voeg gas-free USDT toe aan voortgangsbalk coins
+    window._scenarioCoins = window._scenarioCoins || [];
+    // Voeg een pseudo-coin toe voor de voortgangsbalk
+    window._scenarioGasFreeUsdt = true;
+  } else {
+    gasFreeState.active = false;
+    gasFreeState.balance = 0;
+    window._scenarioGasFreeUsdt = false;
+  }
+};
+
+// ── Patch beginOpdracht voor gas-free account switcher ──
+const _origBeginOpdrachtGF = beginOpdracht;
+beginOpdracht = function() {
+  _origBeginOpdrachtGF();
+
+  if (gasFreeState.active) {
+    // Na korte vertraging: injecteer switcher wanneer cv-dash zichtbaar is
+    const checkReady = setInterval(() => {
+      const dash = document.getElementById('cv-dash');
+      if (dash && dash.classList.contains('active')) {
+        clearInterval(checkReady);
+        injectAccountSwitcher();
+      }
+    }, 200);
+  }
+};
+
+// ── Patch cvShowScreen voor gas-free: switcher opnieuw injecteren na restore ──
+const _origCvShowScreenGF = cvShowScreen;
+cvShowScreen = function(id) {
+  _origCvShowScreenGF(id);
+  if (id === 'cv-dash' && gasFreeState.active) {
+    setTimeout(() => {
+      injectAccountSwitcher();
+      if (activeAccount === 'gasfree') renderGasFreeDashboard();
+    }, 50);
+  }
+};
+
+// ── Patch initVoortgang voor gas-free coin in balk ──
+const _origInitVoortgang = initVoortgang;
+initVoortgang = function() {
+  _origInitVoortgang();
+  if (gasFreeState.active) {
+    const bar = document.getElementById('voortgang-bar');
+    const coinsEl = document.getElementById('voortgang-coins');
+    if (coinsEl) {
+      coinsEl.innerHTML += `<span class="vcoin pending" id="vcp-gasfree_usdt" style="border-color:rgba(0,229,160,.3)">GF-USDT</span>`;
+    }
+  }
+};
+
+// ── Patch checkMissionComplete voor gas-free ──
+const _origCheckMissionGF = checkMissionComplete;
+checkMissionComplete = function() {
+  // Als gas-free actief: check ook of gas-free saldo 0 is
+  if (gasFreeState.active && gasFreeState.balance > 0.001) {
+    // Gas-free saldo nog niet leeg — nog niet klaar
+    // Laat de normale check toch lopen maar block success
+    const _origSuccess = document.getElementById('successModal').classList.contains.bind(document.getElementById('successModal').classList);
+    _origCheckMissionGF();
+    // Als successModal net open ging maar gas-free nog niet leeg: sluit het weer
+    if (document.getElementById('successModal').classList.contains('open') && gasFreeState.balance > 0.001) {
+      document.getElementById('successModal').classList.remove('open');
+      const nl = currentLang === 'nl';
+      showToast('⚠️ ' + t('gf_forgot_toast'));
+    }
+    return;
+  }
+  _origCheckMissionGF();
+};
+
+// ── Patch herlaadOpdracht voor gas-free reset ──
+const _origHerlaadGF = herlaadOpdracht;
+herlaadOpdracht = function() {
+  gasFreeState.active = false;
+  gasFreeState.balance = 0;
+  gasFreeState.txs = [];
+  activeAccount = 'main';
+  window._scenarioGasFreeUsdt = false;
+  // Verwijder account switcher als aanwezig
+  const sw = document.getElementById('account-switcher');
+  if (sw) sw.remove();
+  const nd = document.getElementById('cv-normal-dash');
+  if (nd) {
+    const parent = nd.parentElement;
+    while (nd.firstChild) parent.insertBefore(nd.firstChild, nd);
+    nd.remove();
+  }
+  const gf = document.getElementById('gasfree-dash-content');
+  if (gf) gf.remove();
+  _origHerlaadGF();
+};
+
+</script>
+</body>
+</html>
